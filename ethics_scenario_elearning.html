@@ -1,0 +1,2055 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Right Call — Workplace Ethics</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,400;1,700&family=Nunito:wght@300;400;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════
+   ROOT & RESET
+═══════════════════════════════════════ */
+:root {
+  --forest:    #1b3a2d;
+  --forest2:   #142a20;
+  --forest3:   #0d1f17;
+  --leaf:      #2d6a4f;
+  --leaf2:     #40916c;
+  --mint:      #74c69d;
+  --mint-pale: #d8f3dc;
+  --amber:     #e07b39;
+  --amber2:    #c45d1e;
+  --amber-pale:#fde8d0;
+  --gold:      #f4a261;
+  --ivory:     #fdf8f0;
+  --ivory2:    #f5ede0;
+  --ivory3:    #ede0cc;
+  --ink:       #1a120a;
+  --ink2:      #2e1f0f;
+  --muted:     #7a6a55;
+  --muted2:    #a89070;
+  --sky:       #4895cf;
+  --rose:      #c94070;
+  --border:    rgba(26,18,10,0.1);
+  --radius:    14px;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; overflow: hidden; }
+
+body {
+  font-family: 'Nunito', sans-serif;
+  background: var(--forest3);
+  color: var(--ink);
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ═══════════════════════════════════════
+   TOP HUD BAR
+═══════════════════════════════════════ */
+.hud {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 1.5rem;
+  height: 52px;
+  background: var(--forest3);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  flex-shrink: 0;
+  z-index: 50;
+  gap: 1rem;
+}
+
+.hud-title {
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  font-size: 1rem;
+  color: var(--gold);
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+/* Chapter dots */
+.chapter-dots {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 1;
+  justify-content: center;
+}
+.ch-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.15);
+  transition: all 0.3s;
+  cursor: pointer;
+  position: relative;
+}
+.ch-dot::after {
+  content: attr(data-label);
+  position: absolute;
+  bottom: 130%; left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.55rem;
+  font-family: 'Fira Code', monospace;
+  color: var(--gold);
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s;
+  background: var(--forest);
+  padding: 0.2rem 0.4rem;
+  border-radius: 3px;
+}
+.ch-dot:hover::after { opacity: 1; }
+.ch-dot.done { background: var(--mint); }
+.ch-dot.active { background: var(--amber); width: 24px; border-radius: 4px; }
+.ch-dot.locked { background: rgba(255,255,255,0.06); cursor: default; }
+
+/* Trust meter */
+.trust-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-shrink: 0;
+}
+.trust-label {
+  font-family: 'Fira Code', monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.1em;
+  color: rgba(255,255,255,0.35);
+  text-transform: uppercase;
+}
+.trust-track {
+  width: 100px; height: 8px;
+  background: rgba(255,255,255,0.08);
+  border-radius: 4px;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.08);
+}
+.trust-fill {
+  height: 100%;
+  border-radius: 4px;
+  background: linear-gradient(90deg, var(--amber), var(--mint));
+  transition: width 1s cubic-bezier(.4,0,.2,1);
+}
+.trust-val {
+  font-family: 'Playfair Display', serif;
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: var(--gold);
+  min-width: 2.5ch;
+  text-align: right;
+}
+
+/* ═══════════════════════════════════════
+   MAIN SPLIT LAYOUT
+═══════════════════════════════════════ */
+.split-layout {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 52% 48%;
+  overflow: hidden;
+  position: relative;
+}
+
+/* ═══════════════════════════════════════
+   LEFT — SCENE PANEL
+═══════════════════════════════════════ */
+.scene-panel {
+  position: relative;
+  overflow: hidden;
+  background: var(--forest2);
+}
+
+/* Scene layers */
+.scene-bg {
+  position: absolute;
+  inset: 0;
+  transition: opacity 0.8s ease;
+}
+
+/* Scene divider line */
+.scene-panel::after {
+  content: '';
+  position: absolute;
+  right: 0; top: 0; bottom: 0;
+  width: 3px;
+  background: linear-gradient(180deg, transparent, var(--amber) 30%, var(--amber) 70%, transparent);
+  z-index: 10;
+  opacity: 0.4;
+}
+
+/* ── Scene: Office ── */
+.bg-office {
+  background: linear-gradient(180deg, #1c2e1c 0%, #2a4030 40%, #3d5a45 100%);
+}
+.bg-office .floor {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 35%;
+  background: linear-gradient(180deg, #2a3828, #1e2b1e);
+  border-top: 2px solid rgba(255,255,255,0.05);
+}
+.bg-office .desk {
+  position: absolute;
+  bottom: 30%; left: 15%; right: 15%;
+  height: 18px;
+  background: linear-gradient(180deg, #6b4226, #4a2d18);
+  border-radius: 4px 4px 0 0;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+}
+.bg-office .desk::after {
+  content: '';
+  position: absolute;
+  top: 100%; left: 0; right: 0;
+  height: 60px;
+  background: linear-gradient(180deg, #4a2d18, #2a1a0a);
+  border-radius: 0 0 4px 4px;
+}
+.bg-office .window {
+  position: absolute;
+  top: 8%; right: 12%;
+  width: 120px; height: 90px;
+  background: linear-gradient(135deg, #5ba3d9 0%, #2a7ab8 50%, #1a5a90 100%);
+  border: 3px solid rgba(255,255,255,0.15);
+  border-radius: 4px;
+  overflow: hidden;
+  box-shadow: inset 0 0 30px rgba(91,163,217,0.3), 0 0 40px rgba(91,163,217,0.15);
+}
+.bg-office .window::before {
+  content: '';
+  position: absolute;
+  top: 0; bottom: 0; left: 50%;
+  width: 2px;
+  background: rgba(255,255,255,0.15);
+}
+.bg-office .window::after {
+  content: '';
+  position: absolute;
+  left: 0; right: 0; top: 50%;
+  height: 2px;
+  background: rgba(255,255,255,0.15);
+}
+.bg-office .lamp {
+  position: absolute;
+  bottom: 48%; right: 22%;
+  width: 8px; height: 40px;
+  background: #5a3a20;
+}
+.bg-office .lamp::before {
+  content: '';
+  position: absolute;
+  bottom: 100%; left: 50%;
+  transform: translateX(-50%);
+  width: 30px; height: 16px;
+  background: linear-gradient(180deg, #8b6520, #6b4a15);
+  border-radius: 30px 30px 0 0;
+  clip-path: polygon(0 100%, 100% 100%, 80% 0%, 20% 0%);
+}
+.bg-office .lamp::after {
+  content: '';
+  position: absolute;
+  bottom: 100%; left: 50%;
+  transform: translateX(-50%);
+  width: 60px; height: 60px;
+  background: radial-gradient(circle, rgba(255,200,80,0.25) 0%, transparent 70%);
+  border-radius: 50%;
+  top: -60px;
+}
+.bg-office .monitor {
+  position: absolute;
+  bottom: 48%; left: 22%;
+  width: 60px; height: 44px;
+  background: #1a1a2e;
+  border: 2px solid #333;
+  border-radius: 3px;
+}
+.bg-office .monitor::before {
+  content: '';
+  position: absolute;
+  top: 4px; left: 4px; right: 4px; bottom: 4px;
+  background: linear-gradient(135deg, #0a2a4a, #1a4a7a);
+  border-radius: 1px;
+}
+.bg-office .plant {
+  position: absolute;
+  bottom: 34%; left: 6%;
+  width: 40px;
+}
+.bg-office .plant-pot {
+  width: 28px; height: 22px;
+  background: linear-gradient(180deg, #8b3a10, #6b2a08);
+  border-radius: 2px 2px 6px 6px;
+  margin: 0 auto;
+}
+.bg-office .plant-leaves {
+  display: flex;
+  justify-content: center;
+  gap: 2px;
+  margin-bottom: 2px;
+}
+.bg-office .leaf-svg {
+  width: 16px; height: 24px;
+  background: var(--leaf2);
+  border-radius: 50% 50% 50% 0;
+  transform: rotate(-20deg);
+}
+.bg-office .leaf-svg:nth-child(2) { transform: rotate(20deg); background: var(--leaf); }
+.bg-office .leaf-svg:nth-child(3) { transform: rotate(-10deg) scale(0.8); }
+
+/* ── Scene: Meeting Room ── */
+.bg-meeting {
+  background: linear-gradient(180deg, #1a2535 0%, #243040 50%, #2d3a4a 100%);
+}
+.bg-meeting .mtable {
+  position: absolute;
+  bottom: 28%; left: 8%; right: 8%;
+  height: 20px;
+  background: linear-gradient(180deg, #c8a06a, #9a7040);
+  border-radius: 40px;
+  box-shadow: 0 6px 30px rgba(0,0,0,0.5);
+}
+.bg-meeting .mtable::after {
+  content: '';
+  position: absolute;
+  top: 18px; left: 5%; right: 5%;
+  height: 40px;
+  background: linear-gradient(180deg, #8a5a28, #5a3a18);
+  border-radius: 0 0 20px 20px;
+}
+.bg-meeting .projector-light {
+  position: absolute;
+  top: 5%; right: 5%;
+  width: 80%; height: 70%;
+  background: linear-gradient(135deg, rgba(255,255,255,0.04) 0%, transparent 60%);
+  clip-path: polygon(100% 0, 100% 20%, 30% 100%, 0% 100%, 0% 0%);
+}
+.bg-meeting .screen {
+  position: absolute;
+  top: 5%; left: 5%;
+  width: 35%; height: 55%;
+  background: linear-gradient(135deg, #e8f4f8, #d0e8f0);
+  border: 3px solid rgba(255,255,255,0.2);
+  border-radius: 4px;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 0 40px rgba(200,230,255,0.2);
+}
+.bg-meeting .screen-text {
+  font-family: 'Fira Code', monospace;
+  font-size: 0.4rem;
+  color: #2a4a6a;
+  text-align: center;
+  padding: 4px;
+  line-height: 1.6;
+}
+.bg-meeting .chairs {
+  position: absolute;
+  bottom: 20%; left: 0; right: 0;
+  display: flex;
+  justify-content: space-around;
+  padding: 0 5%;
+}
+.bg-meeting .chair {
+  width: 30px; height: 20px;
+  background: #3a4a5a;
+  border-radius: 3px 3px 0 0;
+  position: relative;
+}
+.bg-meeting .chair::before {
+  content: '';
+  position: absolute;
+  top: -12px; left: 2px; right: 2px;
+  height: 14px;
+  background: #4a5a6a;
+  border-radius: 3px 3px 0 0;
+}
+
+/* ── Scene: Hallway ── */
+.bg-hallway {
+  background: linear-gradient(180deg, #20181a 0%, #2d2020 50%, #3a2828 100%);
+}
+.bg-hallway .corridor {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, rgba(0,0,0,0.3) 0%, transparent 30%),
+    repeating-linear-gradient(90deg, rgba(255,255,255,0.02) 0px, rgba(255,255,255,0.02) 1px, transparent 1px, transparent 80px);
+}
+.bg-hallway .door {
+  position: absolute;
+  bottom: 25%; left: 15%;
+  width: 50px; height: 80px;
+  background: linear-gradient(180deg, #5a3a28, #3a2018);
+  border: 2px solid rgba(255,255,255,0.1);
+  border-radius: 3px 3px 0 0;
+}
+.bg-hallway .door::before {
+  content: '';
+  position: absolute;
+  right: 8px; top: 40%;
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: #c8a040;
+}
+.bg-hallway .door2 {
+  position: absolute;
+  bottom: 25%; right: 20%;
+  width: 40px; height: 65px;
+  background: linear-gradient(180deg, #4a3020, #2a1808);
+  border: 2px solid rgba(255,255,255,0.08);
+  border-radius: 3px 3px 0 0;
+  opacity: 0.6;
+}
+.bg-hallway .ceiling-light {
+  position: absolute;
+  top: 0; left: 50%;
+  transform: translateX(-50%);
+  width: 60px; height: 8px;
+  background: rgba(255,240,180,0.8);
+  box-shadow: 0 0 60px rgba(255,220,120,0.4), 0 0 120px rgba(255,200,80,0.2);
+}
+.bg-hallway .floor-hl {
+  position: absolute;
+  bottom: 0; left: 0; right: 0; height: 28%;
+  background: linear-gradient(180deg, #2a2020, #1a1410);
+}
+
+/* ── Scene: Break Room ── */
+.bg-breakroom {
+  background: linear-gradient(180deg, #28201a 0%, #352a22 50%, #402e25 100%);
+}
+.bg-breakroom .counter {
+  position: absolute;
+  bottom: 25%; left: 0; right: 0;
+  height: 16px;
+  background: linear-gradient(180deg, #c8a070, #8a6040);
+}
+.bg-breakroom .counter::after {
+  content: '';
+  position: absolute;
+  top: 100%; left: 0; right: 0;
+  height: 45px;
+  background: linear-gradient(180deg, #7a5030, #4a3020);
+}
+.bg-breakroom .coffee-maker {
+  position: absolute;
+  bottom: 40%; left: 8%;
+  width: 35px; height: 50px;
+  background: linear-gradient(135deg, #3a3a3a, #1a1a1a);
+  border-radius: 4px;
+}
+.bg-breakroom .coffee-maker::before {
+  content: '';
+  position: absolute;
+  top: 8px; left: 6px; right: 6px;
+  height: 16px;
+  background: linear-gradient(135deg, #1a2a3a, #0a1a2a);
+  border-radius: 2px;
+}
+.bg-breakroom .coffee-maker::after {
+  content: '';
+  position: absolute;
+  bottom: 8px; left: 50%;
+  transform: translateX(-50%);
+  width: 16px; height: 16px;
+  border-radius: 50%;
+  background: #2a1808;
+  border: 2px solid #5a3a20;
+}
+.bg-breakroom .window-br {
+  position: absolute;
+  top: 10%; right: 8%;
+  width: 80px; height: 60px;
+  background: linear-gradient(180deg, #8ab4cc, #5a90b8);
+  border: 2px solid rgba(255,255,255,0.15);
+  border-radius: 3px;
+  box-shadow: 0 0 30px rgba(138,180,204,0.2);
+}
+.bg-breakroom .table-br {
+  position: absolute;
+  bottom: 26%; left: 30%; right: 15%;
+  height: 10px;
+  background: linear-gradient(180deg, #a07850, #7a5830);
+  border-radius: 3px;
+}
+.bg-breakroom .chairs-br {
+  position: absolute;
+  bottom: 18%; left: 35%;
+  display: flex; gap: 20px;
+}
+.bg-breakroom .chair-br {
+  width: 22px; height: 14px;
+  background: #c85030;
+  border-radius: 2px 2px 0 0;
+}
+
+/* ═══════════════════════════════════════
+   CSS CHARACTER AVATARS
+═══════════════════════════════════════ */
+.characters-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+}
+
+.character-fig {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+  transition: all 0.5s ease;
+  cursor: default;
+}
+.character-fig.speaking .char-body { animation: breathe 2s ease-in-out infinite; }
+.character-fig.reacting { animation: react 0.5s ease; }
+@keyframes breathe {
+  0%,100%{transform:scaleY(1)}
+  50%{transform:scaleY(1.015)}
+}
+@keyframes react {
+  0%{transform:translateX(0)}
+  25%{transform:translateX(-8px)}
+  75%{transform:translateX(8px)}
+  100%{transform:translateX(0)}
+}
+
+.char-head {
+  width: 38px; height: 38px;
+  border-radius: 50%;
+  position: relative;
+  margin-bottom: -2px;
+  z-index: 2;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+}
+.char-hair {
+  position: absolute;
+  top: -4px; left: -2px; right: -2px;
+  height: 20px;
+  border-radius: 50% 50% 0 0;
+}
+.char-face {
+  position: absolute;
+  bottom: 4px; left: 4px; right: 4px;
+  height: 22px;
+  border-radius: 0 0 50% 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 3px;
+}
+.char-eyes {
+  display: flex;
+  gap: 8px;
+}
+.char-eye {
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: #1a1a1a;
+  position: relative;
+}
+.char-eye::after {
+  content: '';
+  position: absolute;
+  top: 1px; right: 1px;
+  width: 2px; height: 2px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.7);
+}
+.char-mouth {
+  width: 12px; height: 4px;
+  border-radius: 0 0 6px 6px;
+  border: 2px solid #5a2a1a;
+  border-top: none;
+}
+.char-mouth.smile { border-radius: 0 0 8px 8px; }
+.char-mouth.frown { border-radius: 8px 8px 0 0; border-top: 2px solid #5a2a1a; border-bottom: none; }
+.char-mouth.neutral { border-radius: 0; height: 2px; border: none; background: #5a2a1a; width: 10px; }
+.char-mouth.surprised { border-radius: 50%; width: 10px; height: 8px; }
+
+.char-body {
+  width: 48px;
+  border-radius: 8px 8px 2px 2px;
+  position: relative;
+  transform-origin: top center;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+}
+.char-collar {
+  position: absolute;
+  top: 0; left: 50%;
+  transform: translateX(-50%);
+  width: 16px; height: 10px;
+  clip-path: polygon(0 0, 100% 0, 70% 100%, 30% 100%);
+}
+.char-arms {
+  position: absolute;
+  top: 8px; left: -10px; right: -10px;
+  height: 20px;
+  display: flex;
+  justify-content: space-between;
+}
+.char-arm {
+  width: 10px; height: 30px;
+  border-radius: 5px;
+  transform-origin: top center;
+}
+.char-arm.left { transform: rotate(-8deg); }
+.char-arm.right { transform: rotate(8deg); }
+
+.char-legs {
+  display: flex;
+  gap: 4px;
+  margin-top: 2px;
+}
+.char-leg {
+  width: 18px; height: 28px;
+  border-radius: 0 0 4px 4px;
+}
+.char-shoes {
+  display: flex;
+  gap: 4px;
+  margin-top: 0;
+}
+.char-shoe {
+  width: 20px; height: 8px;
+  border-radius: 4px;
+  background: #1a1a1a;
+}
+
+/* Character: Alex (Manager, You) */
+.char-alex .char-head { background: #d4956a; }
+.char-alex .char-hair { background: #3a2510; }
+.char-alex .char-face { background: #d4956a; }
+.char-alex .char-body { background: #2d4a7a; height: 52px; }
+.char-alex .char-collar { background: #fff; }
+.char-alex .char-arm { background: #2d4a7a; }
+.char-alex .char-leg { background: #1a2a3a; }
+
+/* Character: Sam (Colleague) */
+.char-sam .char-head { background: #c8805a; }
+.char-sam .char-hair { background: #1a0a08; border-radius: 50% 50% 0 0; }
+.char-sam .char-face { background: #c8805a; }
+.char-sam .char-body { background: #4a8a60; height: 50px; }
+.char-sam .char-collar { background: #fff; }
+.char-sam .char-arm { background: #4a8a60; }
+.char-sam .char-leg { background: #2a3a2a; }
+
+/* Character: Maya (Direct Report) */
+.char-maya .char-head { background: #e8b890; }
+.char-maya .char-hair { background: #2a1808; height: 24px; border-radius: 50%; }
+.char-maya .char-face { background: #e8b890; }
+.char-maya .char-body { background: #9a3a5a; height: 54px; }
+.char-maya .char-collar { background: #fff; }
+.char-maya .char-arm { background: #9a3a5a; }
+.char-maya .char-leg { background: #1a1a2a; }
+
+/* Character: Director Chen */
+.char-chen .char-head { background: #c09070; }
+.char-chen .char-hair { background: #0a0a0a; height: 18px; border-radius: 50% 50% 0 0; }
+.char-chen .char-face { background: #c09070; }
+.char-chen .char-body { background: #1a1a1a; height: 56px; }
+.char-chen .char-collar { background: #f0f0f0; }
+.char-chen .char-arm { background: #1a1a1a; }
+.char-chen .char-leg { background: #0a0a0a; }
+
+/* Character: Jordan (HR) */
+.char-jordan .char-head { background: #d8a880; }
+.char-jordan .char-hair { background: #5a3010; height: 22px; border-radius: 50%; }
+.char-jordan .char-face { background: #d8a880; }
+.char-jordan .char-body { background: #6a3a8a; height: 52px; }
+.char-jordan .char-collar { background: #fff; }
+.char-jordan .char-arm { background: #6a3a8a; }
+.char-jordan .char-leg { background: #2a1a3a; }
+
+/* Emotion overlays */
+.char-fig-emotion {
+  position: absolute;
+  top: -20px; right: -10px;
+  font-size: 1rem;
+  animation: emote 0.4s cubic-bezier(.4,0,0,1.5);
+  pointer-events: none;
+}
+@keyframes emote {
+  from { transform: scale(0) translateY(10px); opacity: 0; }
+  to   { transform: scale(1) translateY(0); opacity: 1; }
+}
+
+/* ═══════════════════════════════════════
+   RIGHT — STORY PANEL
+═══════════════════════════════════════ */
+.story-panel {
+  background: var(--ivory);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: relative;
+}
+
+/* Decorative top stripe */
+.story-panel::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--amber), var(--gold), var(--mint));
+  z-index: 10;
+}
+
+/* Chapter badge */
+.chapter-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.8rem 1.5rem 0.6rem;
+  border-bottom: 1px solid var(--border);
+  background: var(--ivory);
+  flex-shrink: 0;
+}
+.chapter-num {
+  font-family: 'Fira Code', monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.15em;
+  color: var(--amber);
+  text-transform: uppercase;
+  background: rgba(224,123,57,0.1);
+  padding: 0.2rem 0.6rem;
+  border-radius: 3px;
+  border: 1px solid rgba(224,123,57,0.2);
+}
+.chapter-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 0.95rem;
+  color: var(--ink);
+  font-style: italic;
+}
+.scene-tag {
+  margin-left: auto;
+  font-family: 'Fira Code', monospace;
+  font-size: 0.55rem;
+  color: var(--muted);
+  letter-spacing: 0.08em;
+}
+
+/* Narrative scroll area */
+.narrative-area {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1.2rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  scroll-behavior: smooth;
+}
+.narrative-area::-webkit-scrollbar { width: 4px; }
+.narrative-area::-webkit-scrollbar-track { background: transparent; }
+.narrative-area::-webkit-scrollbar-thumb { background: var(--ivory3); border-radius: 2px; }
+
+/* Narrator text */
+.narrator-text {
+  font-family: 'Nunito', sans-serif;
+  font-size: 0.88rem;
+  line-height: 1.8;
+  color: var(--muted);
+  font-style: italic;
+  padding: 0.6rem 0.8rem;
+  border-left: 2px solid var(--ivory3);
+  animation: textFadeIn 0.5s ease;
+}
+@keyframes textFadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Speech bubbles */
+.speech-bubble {
+  display: flex;
+  gap: 0.7rem;
+  align-items: flex-start;
+  animation: bubblePop 0.4s cubic-bezier(.4,0,0,1.1);
+}
+@keyframes bubblePop {
+  from { opacity: 0; transform: scale(0.95) translateY(6px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+.speech-bubble.right { flex-direction: row-reverse; }
+
+.bubble-avatar {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  flex-shrink: 0;
+  border: 2px solid rgba(255,255,255,0.8);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+}
+.bubble-content {
+  max-width: 75%;
+}
+.bubble-name {
+  font-family: 'Fira Code', monospace;
+  font-size: 0.58rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 0.25rem;
+}
+.speech-bubble.right .bubble-name { text-align: right; }
+.bubble-text {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 0.7rem 1rem;
+  font-size: 0.88rem;
+  line-height: 1.6;
+  color: var(--ink);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  position: relative;
+}
+.speech-bubble.right .bubble-text {
+  background: linear-gradient(135deg, #e8f5ee, #d4eddf);
+  border-color: rgba(45,106,79,0.2);
+  border-radius: 12px 2px 12px 12px;
+}
+.speech-bubble.left .bubble-text {
+  border-radius: 2px 12px 12px 12px;
+}
+
+/* Outcome banner */
+.outcome-banner {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.7rem 1rem;
+  border-radius: 8px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  animation: textFadeIn 0.4s ease 0.2s both;
+}
+.outcome-banner.positive {
+  background: linear-gradient(135deg, #d8f3dc, #b7e4c7);
+  border: 1px solid #74c69d;
+  color: #1b4332;
+}
+.outcome-banner.negative {
+  background: linear-gradient(135deg, #ffe8e8, #ffd0d0);
+  border: 1px solid #e07b7b;
+  color: #5a1a1a;
+}
+.outcome-banner.neutral {
+  background: linear-gradient(135deg, #fff3e0, #ffe8c0);
+  border: 1px solid #e8a855;
+  color: #5a3a08;
+}
+.outcome-icon { font-size: 1.1rem; flex-shrink: 0; }
+.trust-delta {
+  margin-left: auto;
+  font-family: 'Fira Code', monospace;
+  font-size: 0.72rem;
+  padding: 0.15rem 0.5rem;
+  border-radius: 100px;
+  font-weight: 400;
+}
+.trust-delta.up { background: rgba(45,106,79,0.15); color: #1b4332; }
+.trust-delta.down { background: rgba(180,50,50,0.15); color: #6a1a1a; }
+
+/* Learning note */
+.learning-note {
+  background: linear-gradient(135deg, #fdf8f0, #f5ede0);
+  border: 1px solid rgba(184,134,11,0.25);
+  border-left: 3px solid var(--gold);
+  border-radius: 0 8px 8px 0;
+  padding: 0.8rem 1rem;
+  animation: textFadeIn 0.5s ease 0.3s both;
+}
+.learning-note-label {
+  font-family: 'Fira Code', monospace;
+  font-size: 0.55rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 0.4rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+.learning-note-text {
+  font-size: 0.82rem;
+  line-height: 1.65;
+  color: var(--ink2);
+}
+.learning-note-text strong { color: var(--forest); }
+
+/* ── CHOICES ── */
+.choices-area {
+  padding: 0.8rem 1.5rem 1rem;
+  border-top: 1px solid var(--border);
+  background: var(--ivory);
+  flex-shrink: 0;
+}
+.choices-prompt {
+  font-family: 'Fira Code', monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 0.6rem;
+}
+.choices-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.choice-btn {
+  background: #fff;
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  padding: 0.7rem 1rem;
+  cursor: pointer;
+  text-align: left;
+  font-family: 'Nunito', sans-serif;
+  font-size: 0.84rem;
+  color: var(--ink);
+  line-height: 1.5;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+  position: relative;
+  overflow: hidden;
+}
+.choice-btn::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 3px;
+  background: transparent;
+  transition: background 0.2s;
+}
+.choice-btn:hover {
+  border-color: var(--amber);
+  background: linear-gradient(135deg, #fff9f5, #fff5ee);
+  transform: translateX(2px);
+  box-shadow: 0 2px 12px rgba(224,123,57,0.12);
+}
+.choice-btn:hover::before { background: var(--amber); }
+.choice-letter {
+  font-family: 'Fira Code', monospace;
+  font-size: 0.65rem;
+  font-weight: 700;
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  background: var(--ivory2);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  border: 1px solid var(--border);
+  transition: all 0.2s;
+  color: var(--amber);
+}
+.choice-btn:hover .choice-letter {
+  background: var(--amber);
+  color: #fff;
+  border-color: var(--amber);
+}
+.choice-btn.selected-good {
+  border-color: var(--mint);
+  background: linear-gradient(135deg, #f0faf5, #e0f5ec);
+  pointer-events: none;
+}
+.choice-btn.selected-good::before { background: var(--mint); }
+.choice-btn.selected-good .choice-letter { background: var(--mint); color: #fff; border-color: var(--mint); }
+.choice-btn.selected-bad {
+  border-color: #e07b7b;
+  background: linear-gradient(135deg, #fff5f5, #ffe8e8);
+  pointer-events: none;
+}
+.choice-btn.selected-bad::before { background: #e07b7b; }
+.choice-btn.selected-bad .choice-letter { background: #e07b7b; color: #fff; border-color: #e07b7b; }
+.choice-btn.selected-neutral {
+  border-color: var(--gold);
+  background: linear-gradient(135deg, #fffaf0, #fff5e0);
+  pointer-events: none;
+}
+.choice-btn.selected-neutral::before { background: var(--gold); }
+.choice-btn.disabled { opacity: 0.35; cursor: default; pointer-events: none; }
+.choice-tag {
+  margin-left: auto;
+  font-family: 'Fira Code', monospace;
+  font-size: 0.55rem;
+  padding: 0.15rem 0.5rem;
+  border-radius: 100px;
+  flex-shrink: 0;
+  letter-spacing: 0.06em;
+}
+
+/* ── NAV BUTTONS ── */
+.nav-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 1.5rem 0.8rem;
+  background: var(--ivory);
+  flex-shrink: 0;
+}
+.nav-btn {
+  font-family: 'Fira Code', monospace;
+  font-size: 0.65rem;
+  letter-spacing: 0.08em;
+  padding: 0.5rem 1.1rem;
+  border: 1.5px solid var(--border);
+  background: #fff;
+  color: var(--ink2);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.18s;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+.nav-btn:hover:not(:disabled) {
+  border-color: var(--forest);
+  color: var(--forest);
+  background: linear-gradient(135deg, #f0faf5, #e4f5ec);
+}
+.nav-btn:disabled { opacity: 0.25; cursor: default; }
+.nav-btn.primary {
+  background: var(--forest);
+  border-color: var(--forest);
+  color: #fff;
+}
+.nav-btn.primary:hover { background: var(--forest2); }
+.scene-indicator {
+  font-family: 'Fira Code', monospace;
+  font-size: 0.6rem;
+  color: var(--muted);
+  letter-spacing: 0.06em;
+}
+
+/* ═══════════════════════════════════════
+   TRANSITION OVERLAY
+═══════════════════════════════════════ */
+.scene-transition {
+  position: absolute;
+  inset: 0;
+  background: var(--forest3);
+  z-index: 200;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s;
+}
+.scene-transition.active { opacity: 1; pointer-events: all; }
+
+/* ═══════════════════════════════════════
+   SPLASH SCREEN
+═══════════════════════════════════════ */
+#splash-screen {
+  position: fixed;
+  inset: 0;
+  background: var(--forest3);
+  z-index: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.6s ease;
+}
+#splash-screen.hide { opacity: 0; pointer-events: none; }
+.splash-inner {
+  text-align: center;
+  max-width: 560px;
+  padding: 2rem;
+}
+.splash-eyebrow {
+  font-family: 'Fira Code', monospace;
+  font-size: 0.65rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--mint);
+  margin-bottom: 1rem;
+}
+.splash-title {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(2.5rem,5vw,4rem);
+  font-style: italic;
+  color: var(--ivory);
+  line-height: 1.1;
+  margin-bottom: 0.4rem;
+}
+.splash-title span { color: var(--gold); }
+.splash-subtitle {
+  font-family: 'Playfair Display', serif;
+  font-size: 1rem;
+  color: rgba(255,255,255,0.4);
+  margin-bottom: 2rem;
+  font-style: italic;
+}
+.splash-desc {
+  font-size: 0.9rem;
+  line-height: 1.8;
+  color: rgba(255,255,255,0.55);
+  margin-bottom: 1.5rem;
+  max-width: 45ch;
+  margin-inline: auto;
+}
+.splash-cast {
+  display: flex;
+  gap: 1.2rem;
+  justify-content: center;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+}
+.cast-card {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 10px;
+  padding: 0.8rem;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-width: 120px;
+}
+.cast-avatar {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+.cast-info { text-align: left; }
+.cast-name {
+  font-family: 'Fira Code', monospace;
+  font-size: 0.58rem;
+  color: rgba(255,255,255,0.7);
+  letter-spacing: 0.06em;
+  display: block;
+}
+.cast-role {
+  font-size: 0.65rem;
+  color: rgba(255,255,255,0.3);
+  display: block;
+  margin-top: 0.1rem;
+}
+.splash-pills {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+}
+.splash-pill {
+  background: rgba(255,255,255,0.07);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 100px;
+  padding: 0.3rem 0.8rem;
+  font-size: 0.72rem;
+  color: rgba(255,255,255,0.5);
+}
+.start-btn {
+  font-family: 'Playfair Display', serif;
+  font-size: 1rem;
+  font-style: italic;
+  padding: 0.9rem 2.5rem;
+  background: var(--amber);
+  border: none;
+  border-radius: 8px;
+  color: #fff;
+  cursor: pointer;
+  transition: all 0.2s;
+  letter-spacing: 0.03em;
+  box-shadow: 0 4px 24px rgba(224,123,57,0.3);
+}
+.start-btn:hover { background: var(--amber2); transform: translateY(-2px); box-shadow: 0 8px 32px rgba(224,123,57,0.4); }
+
+/* ═══════════════════════════════════════
+   CERTIFICATE / END SCREEN
+═══════════════════════════════════════ */
+.cert-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(26,18,10,0.85);
+  z-index: 400;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  backdrop-filter: blur(4px);
+}
+.cert-overlay.show { display: flex; }
+.cert-card {
+  background: var(--ivory);
+  border-radius: 16px;
+  padding: 2.5rem;
+  max-width: 600px;
+  width: 100%;
+  text-align: center;
+  box-shadow: 0 24px 80px rgba(0,0,0,0.4);
+  position: relative;
+  overflow: hidden;
+}
+.cert-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--amber), var(--gold-light), var(--mint));
+}
+.cert-stamp { font-size: 3.5rem; margin-bottom: 0.8rem; animation: popIn 0.5s cubic-bezier(.4,0,0,1.4); }
+@keyframes popIn { from{transform:scale(0) rotate(-20deg)}to{transform:scale(1) rotate(0)} }
+.cert-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.8rem;
+  color: var(--ink);
+  margin-bottom: 0.3rem;
+}
+.cert-sub { font-size: 0.85rem; color: var(--muted); margin-bottom: 1.2rem; }
+.cert-score-ring {
+  width: 100px; height: 100px;
+  border-radius: 50%;
+  margin: 0 auto 1.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Playfair Display', serif;
+  font-weight: 900;
+  font-size: 2rem;
+  position: relative;
+}
+.cert-score-ring::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 6px solid transparent;
+}
+.cert-score-ring.high { color: var(--teal2); background: radial-gradient(circle, rgba(45,106,79,0.1), transparent); border: 6px solid var(--mint); }
+.cert-score-ring.mid { color: var(--gold); background: radial-gradient(circle, rgba(184,134,11,0.1), transparent); border: 6px solid var(--gold-light); }
+.cert-score-ring.low { color: var(--amber2); background: radial-gradient(circle, rgba(224,123,57,0.1), transparent); border: 6px solid var(--terra-light); }
+.cert-verdict {
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  font-size: 1.1rem;
+  color: var(--ink);
+  margin-bottom: 0.5rem;
+}
+.cert-feedback { font-size: 0.85rem; line-height: 1.7; color: var(--muted); margin-bottom: 1.5rem; max-width: 44ch; margin-inline: auto; }
+.cert-badges { display: flex; gap: 0.6rem; justify-content: center; flex-wrap: wrap; margin-bottom: 1.5rem; }
+.cert-badge {
+  background: var(--ivory2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.5rem 0.8rem;
+  font-size: 0.75rem;
+  color: var(--ink2);
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+.cert-topics {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+  text-align: left;
+}
+.cert-topic {
+  background: var(--ivory2);
+  border-radius: 6px;
+  padding: 0.5rem 0.8rem;
+  font-size: 0.75rem;
+  color: var(--ink2);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.restart-btn {
+  font-family: 'Nunito', sans-serif;
+  font-weight: 600;
+  font-size: 0.85rem;
+  padding: 0.7rem 1.8rem;
+  background: var(--forest);
+  border: none;
+  border-radius: 8px;
+  color: #fff;
+  cursor: pointer;
+  transition: all 0.18s;
+}
+.restart-btn:hover { background: var(--forest2); }
+
+/* ── TYPEWRITER ── */
+.typewriter { overflow: hidden; }
+.typewriter-cursor {
+  display: inline-block;
+  width: 2px; height: 1em;
+  background: var(--amber);
+  margin-left: 2px;
+  vertical-align: middle;
+  animation: blink 0.7s infinite;
+}
+@keyframes blink { 0%,100%{opacity:1}50%{opacity:0} }
+
+@media (max-width: 750px) {
+  .split-layout { grid-template-columns: 1fr; }
+  .scene-panel { height: 220px; flex-shrink: 0; }
+  .story-panel { flex: 1; overflow: hidden; }
+}
+</style>
+</head>
+<body>
+
+<!-- ═══ SPLASH ═══ -->
+<div id="splash-screen">
+  <div class="splash-inner">
+    <div class="splash-eyebrow">A Scenario-Based eLearning Experience</div>
+    <div class="splash-title">The <span>Right</span> Call</div>
+    <div class="splash-subtitle">A Story of Workplace Ethics &amp; Integrity</div>
+    <p class="splash-desc">
+      Step into Alex's shoes — a newly promoted manager navigating five real ethical dilemmas. Every choice reveals character, builds (or breaks) trust, and shapes the kind of leader you become.
+    </p>
+    <div class="splash-cast">
+      <div class="cast-card">
+        <div class="cast-avatar" style="background:#2d4a7a">👔</div>
+        <div class="cast-info">
+          <span class="cast-name">ALEX</span>
+          <span class="cast-role">You — The Manager</span>
+        </div>
+      </div>
+      <div class="cast-card">
+        <div class="cast-avatar" style="background:#4a8a60">🤝</div>
+        <div class="cast-info">
+          <span class="cast-name">SAM</span>
+          <span class="cast-role">Your Peer</span>
+        </div>
+      </div>
+      <div class="cast-card">
+        <div class="cast-avatar" style="background:#9a3a5a">📋</div>
+        <div class="cast-info">
+          <span class="cast-name">MAYA</span>
+          <span class="cast-role">Your Direct Report</span>
+        </div>
+      </div>
+      <div class="cast-card">
+        <div class="cast-avatar" style="background:#1a1a1a">🏢</div>
+        <div class="cast-info">
+          <span class="cast-name">DIRECTOR CHEN</span>
+          <span class="cast-role">Your Boss</span>
+        </div>
+      </div>
+    </div>
+    <div class="splash-pills">
+      <span class="splash-pill">5 Ethical Dilemmas</span>
+      <span class="splash-pill">Branching Outcomes</span>
+      <span class="splash-pill">Trust Meter</span>
+      <span class="splash-pill">~20 Minutes</span>
+    </div>
+    <button class="start-btn" onclick="startCourse()">Begin the Story ›</button>
+  </div>
+</div>
+
+<!-- ═══ CERTIFICATE ═══ -->
+<div class="cert-overlay" id="cert-overlay">
+  <div class="cert-card">
+    <div class="cert-stamp" id="cert-stamp">🏅</div>
+    <div class="cert-title">Course Complete</div>
+    <div class="cert-sub">The Right Call — Workplace Ethics &amp; Integrity</div>
+    <div class="cert-score-ring" id="cert-ring"><span id="cert-score-num">80</span></div>
+    <div class="cert-verdict" id="cert-verdict">Principled Leader</div>
+    <div class="cert-feedback" id="cert-feedback">Your decisions reflect strong ethical instincts and a commitment to fairness.</div>
+    <div class="cert-badges" id="cert-badges"></div>
+    <div class="cert-topics">
+      <div class="cert-topic">✅ Conflicts of Interest</div>
+      <div class="cert-topic">✅ Confidentiality</div>
+      <div class="cert-topic">✅ Fairness &amp; Bias</div>
+      <div class="cert-topic">✅ Whistleblowing</div>
+      <div class="cert-topic">✅ Performance Management</div>
+    </div>
+    <button class="restart-btn" onclick="restartCourse()">↺ Start Over</button>
+  </div>
+</div>
+
+<!-- ═══ HUD ═══ -->
+<div class="hud" id="main-hud" style="display:none">
+  <div class="hud-title">The Right Call</div>
+  <div class="chapter-dots" id="chapter-dots"></div>
+  <div class="trust-wrap">
+    <div class="trust-label">Trust</div>
+    <div class="trust-track">
+      <div class="trust-fill" id="trust-fill" style="width:50%"></div>
+    </div>
+    <div class="trust-val" id="trust-val">50</div>
+  </div>
+</div>
+
+<!-- ═══ MAIN LAYOUT ═══ -->
+<div class="split-layout" id="main-layout" style="display:none">
+
+  <!-- LEFT: Scene Panel -->
+  <div class="scene-panel" id="scene-panel">
+    <div class="scene-bg bg-office" id="scene-bg">
+      <!-- Office elements -->
+      <div class="floor"></div>
+      <div class="desk"></div>
+      <div class="window"></div>
+      <div class="lamp"></div>
+      <div class="monitor"></div>
+      <div class="plant">
+        <div class="plant-leaves">
+          <div class="leaf-svg"></div>
+          <div class="leaf-svg"></div>
+          <div class="leaf-svg"></div>
+        </div>
+        <div class="plant-pot"></div>
+      </div>
+    </div>
+    <div class="characters-layer" id="chars-layer"></div>
+    <div class="scene-transition" id="scene-transition"></div>
+  </div>
+
+  <!-- RIGHT: Story Panel -->
+  <div class="story-panel">
+    <div class="chapter-badge">
+      <div class="chapter-num" id="chapter-num">Chapter 1</div>
+      <div class="chapter-title" id="chapter-title">Loading...</div>
+      <div class="scene-tag" id="scene-tag">📍 Office</div>
+    </div>
+
+    <div class="narrative-area" id="narrative-area"></div>
+
+    <div class="choices-area" id="choices-area" style="display:none">
+      <div class="choices-prompt">What do you do?</div>
+      <div class="choices-grid" id="choices-grid"></div>
+    </div>
+
+    <div class="nav-row">
+      <button class="nav-btn" id="prev-btn" onclick="prevScene()" disabled>← Back</button>
+      <div class="scene-indicator" id="scene-indicator">Scene 1</div>
+      <button class="nav-btn primary" id="next-btn" onclick="nextScene()">Continue →</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+/* ═══════════════════════════════════════
+   GAME STATE
+═══════════════════════════════════════ */
+let trustScore = 50;
+let currentScene = 0;
+let choicesMade = {};
+let badgesEarned = [];
+
+function changeTrust(delta) {
+  trustScore = Math.max(0, Math.min(100, trustScore + delta));
+  document.getElementById('trust-fill').style.width = trustScore + '%';
+  document.getElementById('trust-val').textContent = trustScore;
+}
+
+/* ═══════════════════════════════════════
+   STORY DATA — 5 CHAPTERS
+═══════════════════════════════════════ */
+const SCENES = [
+
+  /* ─── SCENE 0: Chapter 1 Intro ─── */
+  {
+    chapter: 'Chapter 1', title: 'A Favor Between Friends', location: '📍 Your Office',
+    bg: 'office',
+    chars: [
+      { cls: 'char-alex', x: '55%', y: '20%', size: 120, emotion: 'neutral', label: 'ALEX' },
+      { cls: 'char-sam',  x: '25%', y: '25%', size: 110, emotion: 'smile',   label: 'SAM' },
+    ],
+    narrative: [
+      { type: 'narrator', text: 'Monday, 9:14 AM. You have been manager of the Product Analytics team for exactly three weeks. Your office still smells like fresh paint.' },
+      { type: 'bubble', speaker: 'SAM', avatar: '🤝', side: 'left', text: "Alex! Great — I caught you. I need a huge favor. I'm applying for the Senior Analyst role on the data team, and Director Chen is asking for references from current managers." },
+      { type: 'bubble', speaker: 'YOU (ALEX)', avatar: '👔', side: 'right', text: 'Oh — Sam. Yeah, I know you. We worked on the Q3 forecast together. That was a solid project.' },
+      { type: 'bubble', speaker: 'SAM', avatar: '🤝', side: 'left', text: "Exactly. And honestly, you saw my best work. The thing is... I haven't been a top performer this quarter. My current manager would give me a lukewarm review at best. I just need someone in leadership to say something... positive." },
+    ],
+    choices: [
+      { text: "I'm happy to be a reference — I can speak honestly to the work we did on Q3. That project alone says a lot.", outcome: 'good', delta: +10, label: 'Honest & Supportive', icon: '✅', tag: 'Integrity' },
+      { text: "Sure, Sam. I'll tell Chen you were great across the board. Don't worry about the details.", outcome: 'bad', delta: -15, label: 'Misleading Reference', icon: '⚠️', tag: 'Risk' },
+      { text: "I'm not really comfortable being a reference — I only worked with you once, and I'm still new. Maybe ask someone who knows you better?", outcome: 'neutral', delta: 0, label: 'Politely Decline', icon: '💬', tag: 'Caution' },
+    ],
+    feedback: {
+      good: { banner: 'positive', icon: '✅', text: "You offered honest, scoped support. That's the right approach — you can speak to what you know without overstating.", delta: '+10', learn: "A reference should reflect <strong>what you genuinely observed</strong>. Offering a scoped but genuine reference is far more valuable — and ethical — than a vague endorsement you can't support." },
+      bad:  { banner: 'negative', icon: '⚠️', text: "Providing an inflated reference misleads the hiring team, harms future candidates, and puts your own credibility at risk if the truth surfaces.", delta: '-15', learn: "<strong>Misrepresenting a candidate's performance is a serious ethical violation.</strong> It harms the organization, undermines fair hiring, and exposes you to professional consequences if discovered later." },
+      neutral: { banner: 'neutral', icon: '💬', text: "Declining was cautious, but honest. You could have offered a scoped reference — declining completely leaves Sam without support you legitimately could have given.", delta: '0', learn: "When you have <strong>real, specific observations</strong> about someone's work, offering a scoped reference is often more ethical than declining entirely. 'I can speak to X, but not Y' is always an option." },
+    },
+  },
+
+  /* ─── SCENE 1: Ch1 Resolution ─── */
+  {
+    chapter: 'Chapter 1', title: 'A Favor Between Friends', location: '📍 Your Office',
+    bg: 'office',
+    chars: [
+      { cls: 'char-alex', x: '55%', y: '20%', size: 120, emotion: 'neutral', label: 'ALEX' },
+    ],
+    narrative: [
+      { type: 'narrator', text: 'Sam leaves. You sit with the decision for a moment.' },
+      { type: 'bubble', speaker: 'YOU (ALEX)', avatar: '👔', side: 'right', text: 'That was my first real test. References feel small — but they are not. Every time a leader speaks for someone, their word carries weight.' },
+      { type: 'learn', title: 'Ethics Insight', text: 'Conflicts of interest in hiring arise when personal loyalty influences professional judgment. A manager\'s reference carries institutional authority — it shapes careers and team outcomes. Being honest, even when inconvenient, is what builds a trustworthy reputation.' },
+    ],
+    choices: null,
+  },
+
+  /* ─── SCENE 2: Ch2 Intro ─── */
+  {
+    chapter: 'Chapter 2', title: 'The Overheard Conversation', location: '📍 Break Room',
+    bg: 'breakroom',
+    chars: [
+      { cls: 'char-alex', x: '20%', y: '22%', size: 110, emotion: 'neutral', label: 'ALEX' },
+      { cls: 'char-sam',  x: '60%', y: '25%', size: 100, emotion: 'neutral', label: 'SAM' },
+      { cls: 'char-maya', x: '75%', y: '25%', size: 100, emotion: 'neutral', label: 'MAYA' },
+    ],
+    narrative: [
+      { type: 'narrator', text: 'Wednesday. The break room. You pour coffee, half-listening to the room.' },
+      { type: 'bubble', speaker: 'SAM', avatar: '🤝', side: 'left', text: 'Did you hear about the Q4 budget reallocation? Chen is planning to cut two positions on the analytics side. Nobody knows yet.' },
+      { type: 'bubble', speaker: 'MAYA', avatar: '📋', side: 'left', text: 'Wait — seriously? Which positions? I just turned down a job offer because I thought things were stable here.' },
+      { type: 'narrator', text: 'You freeze. You were in the leadership meeting where this was discussed. It is NOT public information. And now Maya — your direct report — is asking.' },
+      { type: 'bubble', speaker: 'MAYA', avatar: '📋', side: 'left', text: "Alex, you were in that meeting, right? You'd know. Am I safe?" },
+    ],
+    choices: [
+      { text: "Maya, I can't share what was discussed in leadership meetings — that's confidential. But I'll do everything I can to keep you informed as soon as it's appropriate.", outcome: 'good', delta: +10, label: 'Protect Confidentiality', icon: '✅', tag: 'Trust' },
+      { text: "Between us — yes, there are cuts coming. I'm not supposed to say this but you deserve to know.", outcome: 'bad', delta: -20, label: 'Share Confidential Info', icon: '🚨', tag: 'Breach' },
+      { text: "I honestly don't know what Sam is talking about. Nothing has been decided.", outcome: 'bad', delta: -10, label: 'Deflect with a Lie', icon: '⚠️', tag: 'Dishonest' },
+    ],
+    feedback: {
+      good: { banner: 'positive', icon: '✅', text: "Excellent. You respected confidentiality while acknowledging Maya's concern with empathy and a genuine commitment to keep her informed appropriately.", delta: '+10', learn: "<strong>Confidentiality is foundational to trust in leadership.</strong> When you protect sensitive information while committing to transparency at the right moment, you build credibility with both your team and senior leaders." },
+      bad:  { banner: 'negative', icon: '🚨', text: "Sharing unannounced organizational decisions can trigger panic, spread rumors, harm morale, and put you in serious professional jeopardy.", delta: '-20', learn: "Leaking confidential information — even with good intentions — undermines <strong>organizational trust and your legal obligations</strong>. The right move is to acknowledge what you cannot share, and commit to a timeline for proper communication." },
+      neutral: { banner: 'negative', icon: '⚠️', text: "Deflecting with a false statement is still a lie — and if discovered, it damages your credibility far more than the original dilemma.", delta: '-10', learn: "When you cannot share information, say so honestly: <strong>\"I can't speak to that right now.\"</strong> A non-answer is not the same as a lie — and it preserves your integrity." },
+    },
+  },
+
+  /* ─── SCENE 3: Ch2 Resolution ─── */
+  {
+    chapter: 'Chapter 2', title: 'The Overheard Conversation', location: '📍 Break Room',
+    bg: 'breakroom',
+    chars: [
+      { cls: 'char-alex', x: '40%', y: '22%', size: 115, emotion: 'neutral', label: 'ALEX' },
+    ],
+    narrative: [
+      { type: 'narrator', text: 'Later that afternoon, you speak with Director Chen about the timeline for communicating the restructuring. You push for faster, clearer communication.' },
+      { type: 'bubble', speaker: 'YOU (ALEX)', avatar: '👔', side: 'right', text: "Chen, I want to flag something. People are already hearing rumors. I think we need to communicate the restructuring plan — whatever it is — sooner rather than later. Uncertainty is its own kind of damage." },
+      { type: 'learn', title: 'Ethics Insight', text: 'Confidentiality does not mean silence forever. It means <strong>respecting the timing and process</strong> for sharing sensitive information. A good manager both honors confidentiality and advocates for timely, honest communication with their team.' },
+    ],
+    choices: null,
+  },
+
+  /* ─── SCENE 4: Ch3 Intro ─── */
+  {
+    chapter: 'Chapter 3', title: 'The Performance Review', location: '📍 Meeting Room',
+    bg: 'meeting',
+    chars: [
+      { cls: 'char-alex', x: '55%', y: '18%', size: 120, emotion: 'neutral', label: 'ALEX' },
+      { cls: 'char-maya', x: '20%', y: '22%', size: 110, emotion: 'neutral', label: 'MAYA' },
+    ],
+    narrative: [
+      { type: 'narrator', text: "Performance review season. Maya sits across from you. She's been a solid contributor — but the last project ran significantly over schedule due to unclear requirements from another team." },
+      { type: 'bubble', speaker: 'MAYA', avatar: '📋', side: 'left', text: "I know the timeline on the Horizon project wasn't great. But I want to be transparent — the specs from the dev team kept changing. I flagged it twice, but it didn't get escalated." },
+      { type: 'narrator', text: "You review her file. Her work quality is strong. The delay was partially due to cross-team miscommunication that was outside her control. But the result on paper looks poor. Your boss, Director Chen, has suggested you rate her 'Below Expectations' to match the project outcome numbers." },
+      { type: 'bubble', speaker: 'YOU (ALEX)', avatar: '👔', side: 'right', text: 'Director Chen wants numbers-based ratings this cycle. The project ran late. That is going to show up...' },
+    ],
+    choices: [
+      { text: "I'll write Maya's review to reflect the full picture — her individual performance was strong; the delay had documented systemic causes. I'll have a direct conversation with Chen about this.", outcome: 'good', delta: +15, label: 'Fair & Evidence-Based', icon: '✅', tag: 'Fairness' },
+      { text: "I'll give Maya the 'Below Expectations' rating Chen suggested. It's easier, and the numbers do look bad on paper.", outcome: 'bad', delta: -20, label: 'Follow Pressure Blindly', icon: '⚠️', tag: 'Bias Risk' },
+      { text: "I'll give Maya a neutral 'Meets Expectations' without addressing the real situation — it's a compromise that avoids conflict.", outcome: 'neutral', delta: -5, label: 'Avoid the Issue', icon: '💬', tag: 'Incomplete' },
+    ],
+    feedback: {
+      good: { banner: 'positive', icon: '✅', text: "You acted with fairness and integrity. Writing a contextual review and addressing the pressure from leadership directly is exactly what ethical management looks like.", delta: '+15', learn: "<strong>Fairness in performance reviews</strong> means evaluating the full context, not just numbers. Systemic barriers that affect performance must be documented and surfaced — not assigned to the individual. Advocating for your team is a core leadership responsibility." },
+      bad:  { banner: 'negative', icon: '⚠️', text: "Following pressure to assign an inaccurate rating harms Maya's career, introduces bias into the system, and sets a precedent for number-washing over fairness.", delta: '-20', learn: "Performance evaluations that ignore context are a leading cause of <strong>systemic bias in organizations</strong>. A manager who rates based on outcomes alone — without examining contributing factors — fails both their employee and the organization's commitment to equitable treatment." },
+      neutral: { banner: 'neutral', icon: '💬', text: "Avoiding the real conversation protects neither Maya nor your integrity. A 'safe' rating that sidesteps the truth still leaves the systemic issue unaddressed.", delta: '-5', learn: "Neutral ratings given to <strong>avoid difficult conversations</strong> are a form of ethical avoidance. They protect the manager in the short term but fail the employee and perpetuate systemic problems. Courageous honesty — not comfort — is what builds great managers." },
+    },
+  },
+
+  /* ─── SCENE 5: Ch3 Resolution ─── */
+  {
+    chapter: 'Chapter 3', title: 'The Performance Review', location: '📍 Meeting Room',
+    bg: 'meeting',
+    chars: [
+      { cls: 'char-alex', x: '30%', y: '18%', size: 120, emotion: 'neutral', label: 'ALEX' },
+      { cls: 'char-chen', x: '65%', y: '20%', size: 115, emotion: 'neutral', label: 'CHEN' },
+    ],
+    narrative: [
+      { type: 'narrator', text: 'You schedule a meeting with Director Chen. You walk in with Maya\'s documented performance data and the change log from the dev team.' },
+      { type: 'bubble', speaker: 'DIRECTOR CHEN', avatar: '🏢', side: 'left', text: 'Alex. I see you have Maya rated at Exceeds in quality. The project was late. Help me understand your thinking.' },
+      { type: 'bubble', speaker: 'YOU (ALEX)', avatar: '👔', side: 'right', text: "The delay had three documented root causes — none of them were within Maya's control. She actually flagged the issues twice before they escalated. I can't in good conscience rate her individual performance as 'Below' when the evidence says otherwise." },
+      { type: 'bubble', speaker: 'DIRECTOR CHEN', avatar: '🏢', side: 'left', text: "...I appreciate you bringing the data. Let's revisit the calibration criteria for cross-team projects. This may be a broader gap in our process." },
+      { type: 'learn', title: 'Ethics Insight', text: 'Ethical leadership sometimes means <strong>respectfully pushing back on pressure from above</strong> when the evidence supports a different conclusion. Evidence-based advocacy — not defiance — is how you create fair systems.' },
+    ],
+    choices: null,
+  },
+
+  /* ─── SCENE 6: Ch4 Intro ─── */
+  {
+    chapter: 'Chapter 4', title: 'The Shortcut', location: '📍 Hallway',
+    bg: 'hallway',
+    chars: [
+      { cls: 'char-alex', x: '30%', y: '18%', size: 120, emotion: 'neutral', label: 'ALEX' },
+      { cls: 'char-sam',  x: '65%', y: '20%', size: 110, emotion: 'neutral', label: 'SAM' },
+    ],
+    narrative: [
+      { type: 'narrator', text: 'Thursday afternoon. Sam catches up to you in the hallway, glancing over their shoulder.' },
+      { type: 'bubble', speaker: 'SAM', avatar: '🤝', side: 'left', text: "Alex, heads up — I heard through the grapevine that we're pitching to Nexus Corp on Friday. Huge deal. I also happen to know their CFO from my last company. I could make a call, get some inside info on their priorities." },
+      { type: 'bubble', speaker: 'YOU (ALEX)', avatar: '👔', side: 'right', text: 'What kind of inside info are we talking about?' },
+      { type: 'bubble', speaker: 'SAM', avatar: '🤝', side: 'left', text: "You know — what their pain points really are, how their board is thinking, maybe even what competing bids look like. Nothing illegal, just... networking. Could be the edge we need to close the deal." },
+    ],
+    choices: [
+      { text: "Sam, I appreciate the hustle — but using private client intel from personal relationships crosses a line. If it ever came out, it could void the deal and expose us legally. We win on merit.", outcome: 'good', delta: +15, label: 'Decline the Shortcut', icon: '✅', tag: 'Integrity' },
+      { text: "That sounds like a competitive advantage. Go for it — just don't put anything in writing.", outcome: 'bad', delta: -20, label: 'Encourage the Risk', icon: '🚨', tag: 'Unethical' },
+      { text: "Let me check with legal first, and if they say it's fine, then maybe. But I'm skeptical.", outcome: 'neutral', delta: +5, label: 'Escalate to Legal', icon: '💬', tag: 'Cautious' },
+    ],
+    feedback: {
+      good: { banner: 'positive', icon: '✅', text: "A clear, confident 'no' on ethical grounds — and you framed it as protecting the team, not lecturing Sam. That's leadership.", delta: '+15', learn: "Using <strong>confidential third-party information obtained through personal relationships</strong> — even informally — can constitute unfair business practice or breach of fiduciary duty. Winning on merit protects everyone and builds sustainable competitive advantage." },
+      bad:  { banner: 'negative', icon: '🚨', text: "Encouraging the use of improperly obtained competitive intelligence exposes the company to legal liability and reputational damage — and makes you personally complicit.", delta: '-20', learn: "<strong>\"Don't put it in writing\"</strong> is not an ethics strategy — it's a cover-up. If an action would not survive public scrutiny or a legal review, it should not be taken. The absence of a paper trail does not make something ethical." },
+      neutral: { banner: 'positive', icon: '💬', text: "Pausing and escalating to legal is a responsible move. It's not the most direct 'no,' but it protects the organization and gets the right people involved.", delta: '+5', learn: "When in doubt, <strong>involving compliance or legal counsel</strong> is almost always the right instinct. That said, some situations are clear enough that a manager should be able to say 'no' directly, without needing approval to do the right thing." },
+    },
+  },
+
+  /* ─── SCENE 7: Ch4 Resolution ─── */
+  {
+    chapter: 'Chapter 4', title: 'The Shortcut', location: '📍 Your Office',
+    bg: 'office',
+    chars: [
+      { cls: 'char-alex', x: '50%', y: '18%', size: 120, emotion: 'neutral', label: 'ALEX' },
+    ],
+    narrative: [
+      { type: 'narrator', text: 'The Nexus Corp pitch goes ahead — on the strength of your team\'s actual work. The proposal is sharp. Honest. Yours.' },
+      { type: 'bubble', speaker: 'YOU (ALEX)', avatar: '👔', side: 'right', text: "We got the meeting. Our credentials, our case studies, our team's thinking. If we win this, we'll know we earned it." },
+      { type: 'learn', title: 'Ethics Insight', text: 'Ethical business development means competing on the strength of your capabilities, not on information you should not have. <strong>Shortcuts that work once often become habits</strong> — and eventually, crises. Sustainable success is built on trust, not angles.' },
+    ],
+    choices: null,
+  },
+
+  /* ─── SCENE 8: Ch5 Intro ─── */
+  {
+    chapter: 'Chapter 5', title: 'The Report You Cannot Ignore', location: '📍 Meeting Room',
+    bg: 'meeting',
+    chars: [
+      { cls: 'char-alex',   x: '50%', y: '18%', size: 120, emotion: 'neutral', label: 'ALEX' },
+      { cls: 'char-jordan', x: '18%', y: '22%', size: 110, emotion: 'neutral', label: 'JORDAN' },
+    ],
+    narrative: [
+      { type: 'narrator', text: "Final chapter. Jordan from HR requests a meeting. They close the door." },
+      { type: 'bubble', speaker: 'JORDAN (HR)', avatar: '🗂️', side: 'left', text: "Alex, I need to be direct with you. We've received a report that someone on your team may be falsifying timesheet data. Specifically, logging hours on projects they were not actually working on." },
+      { type: 'bubble', speaker: 'YOU (ALEX)', avatar: '👔', side: 'right', text: "That's a serious allegation. Do we know who filed the report?" },
+      { type: 'bubble', speaker: 'JORDAN (HR)', avatar: '🗂️', side: 'left', text: "It was anonymous. I need you to do an informal check — look at the logs, see if anything seems off. If you find something, we handle it formally. If you find nothing, we note that and close it." },
+      { type: 'narrator', text: "You review the logs that evening. There are discrepancies. Hours logged on three projects during days the employee was at a confirmed out-of-office training. It looks damning — but there could be legitimate reasons." },
+    ],
+    choices: [
+      { text: "I'll document what I found, report it to Jordan with full context, and recommend a formal investigation — letting HR lead the process without pre-judging the outcome.", outcome: 'good', delta: +20, label: 'Escalate Properly', icon: '✅', tag: 'Process' },
+      { text: "I'll quietly confront the employee myself and tell them to fix the timesheets — give them a chance to correct it without it becoming a formal issue.", outcome: 'bad', delta: -15, label: 'Handle It Informally', icon: '⚠️', tag: 'Risk' },
+      { text: "The discrepancies are ambiguous. I'll mark it as 'no clear evidence found' and not escalate — I don't want to ruin someone's career on circumstantial data.", outcome: 'neutral', delta: -10, label: 'Bury the Finding', icon: '⚠️', tag: 'Incomplete' },
+    ],
+    feedback: {
+      good: { banner: 'positive', icon: '✅', text: "You handled this exactly right — documented the findings, kept an open mind, and handed it to the proper process. That's both ethical and legally sound.", delta: '+20', learn: "<strong>When investigating potential misconduct</strong>, the manager's role is to gather and report facts — not to adjudicate, punish, or conceal. Proper escalation protects the employee's right to due process, protects the organization, and protects you." },
+      bad:  { banner: 'negative', icon: '⚠️', text: "Informal confrontations about misconduct bypass due process, expose you to liability, and can compromise formal proceedings if the case escalates.", delta: '-15', learn: "Handling misconduct informally — especially involving financial fraud — can constitute <strong>obstruction of internal investigation</strong>. Always involve HR and follow established procedures. Informal resolution of formal misconduct is not your decision to make unilaterally." },
+      neutral: { banner: 'negative', icon: '⚠️', text: "Burying a documented finding, even with compassionate intent, is a serious ethical failure — and potentially a legal one if the conduct continues.", delta: '-10', learn: "A manager who suppresses evidence of misconduct — even ambiguous evidence — <strong>becomes part of the problem</strong>. The correct action is to document what you found, report it honestly, and let the formal process determine the outcome. Protecting someone informally is not the same as being fair." },
+    },
+  },
+
+  /* ─── SCENE 9: Final ─── */
+  {
+    chapter: 'Epilogue', title: 'The Leader You Choose to Be', location: '📍 Your Office',
+    bg: 'office',
+    chars: [
+      { cls: 'char-alex', x: '45%', y: '18%', size: 130, emotion: 'smile', label: 'ALEX' },
+    ],
+    narrative: [
+      { type: 'narrator', text: 'Six months later. Your team is intact. Maya got a deserved promotion. The Nexus Corp pitch won. Jordan sent you a note of appreciation. Sam — well, Sam is still figuring things out.' },
+      { type: 'bubble', speaker: 'YOU (ALEX)', avatar: '👔', side: 'right', text: "Nobody teaches you this part of the job. The ethical moments don't come with warning labels. They arrive looking like small decisions — and they turn out to be the only ones that really matter." },
+      { type: 'learn', title: 'Course Reflection', text: 'Every leader faces moments where the easier path is also the wrong one. <strong>Ethical leadership is not about perfection</strong> — it is about noticing the moment, pausing, and choosing with intention. The five dilemmas you navigated today reflect real situations that real managers face. Your Trust Score reflects the quality of your choices.' },
+    ],
+    choices: null,
+    isLast: true,
+  },
+];
+
+/* Character positions by scene */
+const SCENE_CHARS = {
+  office: `
+    <div class="character-fig char-alex" style="position:absolute;bottom:33%;left:52%">
+      <div class="char-head">
+        <div class="char-hair"></div>
+        <div class="char-face">
+          <div class="char-eyes"><div class="char-eye"></div><div class="char-eye"></div></div>
+          <div class="char-mouth smile"></div>
+        </div>
+      </div>
+      <div class="char-body">
+        <div class="char-collar"></div>
+        <div class="char-arms">
+          <div class="char-arm left"></div>
+          <div class="char-arm right"></div>
+        </div>
+      </div>
+    </div>`,
+};
+
+/* ═══════════════════════════════════════
+   BUILD SCENE BACKGROUNDS
+═══════════════════════════════════════ */
+const BG_HTML = {
+  office: `
+    <div class="floor"></div>
+    <div class="desk"></div>
+    <div class="window"></div>
+    <div class="lamp"></div>
+    <div class="monitor"></div>
+    <div class="plant">
+      <div class="plant-leaves">
+        <div class="leaf-svg"></div><div class="leaf-svg"></div><div class="leaf-svg"></div>
+      </div>
+      <div class="plant-pot"></div>
+    </div>`,
+  meeting: `
+    <div class="projector-light"></div>
+    <div class="screen"><div class="screen-text">Q4 STRATEGY<br>────────<br>NEXUS CORP<br>PITCH DECK<br>v2.1</div></div>
+    <div class="mtable"></div>
+    <div class="chairs">
+      <div class="chair"></div><div class="chair"></div>
+      <div class="chair"></div><div class="chair"></div>
+    </div>`,
+  breakroom: `
+    <div class="counter"></div>
+    <div class="coffee-maker"></div>
+    <div class="window-br"></div>
+    <div class="table-br"></div>
+    <div class="chairs-br">
+      <div class="chair-br"></div><div class="chair-br"></div>
+    </div>`,
+  hallway: `
+    <div class="corridor"></div>
+    <div class="ceiling-light"></div>
+    <div class="floor-hl"></div>
+    <div class="door"></div>
+    <div class="door2"></div>`,
+};
+
+/* Character builder */
+const CHAR_CONFIGS = {
+  'char-alex':   { head: '#d4956a', hair: '#3a2510', body: '#2d4a7a', leg: '#1a2a3a', collar: '#fff' },
+  'char-sam':    { head: '#c8805a', hair: '#1a0a08', body: '#4a8a60', leg: '#2a3a2a', collar: '#fff' },
+  'char-maya':   { head: '#e8b890', hair: '#2a1808', body: '#9a3a5a', leg: '#1a1a2a', collar: '#fff' },
+  'char-chen':   { head: '#c09070', hair: '#0a0a0a', body: '#1a1a1a', leg: '#0a0a0a', collar: '#f0f0f0' },
+  'char-jordan': { head: '#d8a880', hair: '#5a3010', body: '#6a3a8a', leg: '#2a1a3a', collar: '#fff' },
+};
+
+function buildChar(cls, x, y, size, mouthType) {
+  const cfg = CHAR_CONFIGS[cls];
+  const scale = size / 120;
+  const mouth = mouthType || 'smile';
+  return `
+  <div style="position:absolute;left:${x};bottom:${y};transform:translateX(-50%) scale(${scale});transform-origin:bottom center;display:flex;flex-direction:column;align-items:center;gap:0;transition:all 0.5s;">
+    <div style="width:38px;height:38px;border-radius:50%;background:${cfg.head};position:relative;margin-bottom:-2px;z-index:2;box-shadow:0 4px 12px rgba(0,0,0,0.4);">
+      <div style="position:absolute;top:-4px;left:-2px;right:-2px;height:20px;border-radius:50% 50% 0 0;background:${cfg.hair};"></div>
+      <div style="position:absolute;bottom:4px;left:4px;right:4px;height:22px;border-radius:0 0 50% 50%;background:${cfg.head};display:flex;align-items:center;justify-content:center;flex-direction:column;gap:3px;">
+        <div style="display:flex;gap:8px;">
+          <div style="width:5px;height:5px;border-radius:50%;background:#1a1a1a;"></div>
+          <div style="width:5px;height:5px;border-radius:50%;background:#1a1a1a;"></div>
+        </div>
+        <div style="width:12px;height:4px;border-radius:${mouth==='smile'?'0 0 8px 8px':mouth==='frown'?'8px 8px 0 0':'0'};border:2px solid #5a2a1a;${mouth==='frown'?'border-top:2px solid #5a2a1a;border-bottom:none;':'border-top:none;'}${mouth==='neutral'?'height:2px;border:none;background:#5a2a1a;width:10px;':''}"></div>
+      </div>
+    </div>
+    <div style="width:48px;height:52px;background:${cfg.body};border-radius:8px 8px 2px 2px;position:relative;box-shadow:0 6px 20px rgba(0,0,0,0.4);">
+      <div style="position:absolute;top:0;left:50%;transform:translateX(-50%);width:16px;height:10px;clip-path:polygon(0 0,100% 0,70% 100%,30% 100%);background:${cfg.collar};"></div>
+    </div>
+    <div style="display:flex;gap:4px;margin-top:2px;">
+      <div style="width:18px;height:28px;border-radius:0 0 4px 4px;background:${cfg.leg};"></div>
+      <div style="width:18px;height:28px;border-radius:0 0 4px 4px;background:${cfg.leg};"></div>
+    </div>
+  </div>`;
+}
+
+/* ═══════════════════════════════════════
+   RENDER ENGINE
+═══════════════════════════════════════ */
+let narrativeQueue = [];
+let choiceAnswered = false;
+let choiceResult = null;
+
+function renderScene(idx) {
+  const scene = SCENES[idx];
+  if (!scene) return;
+
+  choiceAnswered = false;
+  choiceResult = null;
+
+  /* Chapter badge */
+  document.getElementById('chapter-num').textContent = scene.chapter;
+  document.getElementById('chapter-title').textContent = scene.title;
+  document.getElementById('scene-tag').textContent = scene.location;
+
+  /* Scene background */
+  const bg = document.getElementById('scene-bg');
+  bg.className = 'scene-bg bg-' + scene.bg;
+  bg.innerHTML = BG_HTML[scene.bg] || '';
+
+  /* Characters */
+  const layer = document.getElementById('chars-layer');
+  layer.innerHTML = '';
+  if (scene.chars) {
+    scene.chars.forEach(c => {
+      const mouth = c.emotion === 'smile' ? 'smile' : c.emotion === 'frown' ? 'frown' : 'neutral';
+      layer.innerHTML += buildChar(c.cls, c.x, c.y, c.size, mouth);
+    });
+  }
+
+  /* Narrative */
+  const area = document.getElementById('narrative-area');
+  area.innerHTML = '';
+  narrativeQueue = scene.narrative || [];
+  narrativeQueue.forEach((n, i) => {
+    renderNarrativeItem(n, i * 80);
+  });
+
+  /* Choices */
+  const choicesArea = document.getElementById('choices-area');
+  const choicesGrid = document.getElementById('choices-grid');
+  if (scene.choices) {
+    choicesArea.style.display = 'block';
+    choicesGrid.innerHTML = '';
+    const letters = ['A', 'B', 'C'];
+    scene.choices.forEach((ch, i) => {
+      const btn = document.createElement('button');
+      btn.className = 'choice-btn';
+      btn.innerHTML = `<span class="choice-letter">${letters[i]}</span>${ch.text}<span class="choice-tag">${ch.icon} ${ch.tag}</span>`;
+      btn.onclick = () => handleChoice(idx, i);
+      choicesGrid.appendChild(btn);
+    });
+  } else {
+    choicesArea.style.display = 'none';
+  }
+
+  /* Navigation */
+  updateNav(idx);
+
+  /* Progress dots */
+  updateDots(idx);
+
+  /* Scene indicator */
+  document.getElementById('scene-indicator').textContent = `Scene ${idx + 1} of ${SCENES.length}`;
+
+  /* Scroll to top */
+  setTimeout(() => { area.scrollTop = 0; }, 50);
+}
+
+function renderNarrativeItem(item, delay) {
+  const area = document.getElementById('narrative-area');
+  setTimeout(() => {
+    let el;
+    if (item.type === 'narrator') {
+      el = document.createElement('div');
+      el.className = 'narrator-text';
+      el.textContent = item.text;
+    } else if (item.type === 'bubble') {
+      el = document.createElement('div');
+      el.className = 'speech-bubble ' + (item.side || 'left');
+      const avatarBg = { 'SAM': '#4a8a60', 'MAYA': '#9a3a5a', 'DIRECTOR CHEN': '#1a1a1a', 'JORDAN (HR)': '#6a3a8a', 'YOU (ALEX)': '#2d4a7a', 'ALEX': '#2d4a7a' };
+      const bg = avatarBg[item.speaker] || '#666';
+      el.innerHTML = `
+        <div class="bubble-avatar" style="background:${bg}">${item.avatar}</div>
+        <div class="bubble-content">
+          <div class="bubble-name">${item.speaker}</div>
+          <div class="bubble-text">${item.text}</div>
+        </div>`;
+    } else if (item.type === 'learn') {
+      el = document.createElement('div');
+      el.className = 'learning-note';
+      el.innerHTML = `<div class="learning-note-label">📖 ${item.title || 'Learning Insight'}</div><div class="learning-note-text">${item.text}</div>`;
+    }
+    if (el) {
+      area.appendChild(el);
+      area.scrollTop = area.scrollHeight;
+    }
+  }, delay);
+}
+
+function handleChoice(sceneIdx, choiceIdx) {
+  if (choiceAnswered) return;
+  choiceAnswered = true;
+
+  const scene = SCENES[sceneIdx];
+  const choice = scene.choices[choiceIdx];
+  const fb = scene.feedback[choice.outcome];
+
+  choicesMade[sceneIdx] = { choice: choiceIdx, outcome: choice.outcome };
+  choiceResult = choice.outcome;
+
+  /* Visual feedback on buttons */
+  const btns = document.querySelectorAll('.choice-btn');
+  btns.forEach((btn, i) => {
+    if (i === choiceIdx) {
+      btn.classList.add('selected-' + (choice.outcome === 'good' ? 'good' : choice.outcome === 'bad' ? 'bad' : 'neutral'));
+    } else {
+      btn.classList.add('disabled');
+    }
+  });
+
+  /* Trust change */
+  changeTrust(choice.delta);
+
+  /* Badge tracking */
+  if (choice.outcome === 'good') {
+    const badges = ['Principled', 'Trustworthy', 'Fair', 'Courageous', 'Accountable'];
+    const b = badges[Math.floor(sceneIdx / 2)];
+    if (b && !badgesEarned.includes(b)) badgesEarned.push(b);
+  }
+
+  /* Render outcome in narrative area */
+  const area = document.getElementById('narrative-area');
+
+  setTimeout(() => {
+    /* Outcome banner */
+    const banner = document.createElement('div');
+    banner.className = 'outcome-banner ' + fb.banner;
+    banner.innerHTML = `<span class="outcome-icon">${fb.icon}</span><span>${fb.text}</span><span class="trust-delta ${choice.delta >= 0 ? 'up' : 'down'}">${choice.delta >= 0 ? '+' : ''}${choice.delta} Trust</span>`;
+    area.appendChild(banner);
+
+    /* Learning note */
+    setTimeout(() => {
+      const note = document.createElement('div');
+      note.className = 'learning-note';
+      note.innerHTML = `<div class="learning-note-label">📖 Ethics Insight</div><div class="learning-note-text">${fb.learn}</div>`;
+      area.appendChild(note);
+      area.scrollTop = area.scrollHeight;
+    }, 400);
+
+    /* Enable next */
+    document.getElementById('next-btn').disabled = false;
+    area.scrollTop = area.scrollHeight;
+  }, 300);
+}
+
+function updateNav(idx) {
+  const prev = document.getElementById('prev-btn');
+  const next = document.getElementById('next-btn');
+  const scene = SCENES[idx];
+
+  prev.disabled = idx === 0;
+
+  if (scene.isLast) {
+    next.textContent = 'View Results ★';
+    next.onclick = showCertificate;
+  } else {
+    next.textContent = 'Continue →';
+    next.onclick = nextScene;
+  }
+
+  /* Block next if choice not made */
+  if (scene.choices && !choiceAnswered) {
+    next.disabled = true;
+  } else {
+    next.disabled = false;
+  }
+}
+
+function updateDots(idx) {
+  const container = document.getElementById('chapter-dots');
+  const dots = container.querySelectorAll('.ch-dot');
+  dots.forEach((d, i) => {
+    d.className = 'ch-dot';
+    if (i < idx) d.classList.add('done');
+    else if (i === idx) d.classList.add('active');
+    else d.classList.add('locked');
+  });
+}
+
+function nextScene() {
+  if (currentScene < SCENES.length - 1) {
+    transitionTo(currentScene + 1);
+  }
+}
+
+function prevScene() {
+  if (currentScene > 0) {
+    transitionTo(currentScene - 1);
+  }
+}
+
+function transitionTo(idx) {
+  const overlay = document.getElementById('scene-transition');
+  overlay.classList.add('active');
+  setTimeout(() => {
+    currentScene = idx;
+    renderScene(currentScene);
+    setTimeout(() => overlay.classList.remove('active'), 100);
+  }, 350);
+}
+
+/* ═══════════════════════════════════════
+   CERTIFICATE
+═══════════════════════════════════════ */
+function showCertificate() {
+  const overlay = document.getElementById('cert-overlay');
+  overlay.classList.add('show');
+
+  const num = document.getElementById('cert-score-num');
+  const ring = document.getElementById('cert-ring');
+  num.textContent = trustScore;
+
+  if (trustScore >= 75) {
+    ring.className = 'cert-score-ring high';
+    document.getElementById('cert-stamp').textContent = '🏅';
+    document.getElementById('cert-verdict').textContent = 'Principled Leader';
+    document.getElementById('cert-feedback').textContent = 'Your choices reflect strong ethical instincts, courage under pressure, and a commitment to fairness and integrity. Your team is fortunate to have you.';
+  } else if (trustScore >= 50) {
+    ring.className = 'cert-score-ring mid';
+    document.getElementById('cert-stamp').textContent = '📜';
+    document.getElementById('cert-verdict').textContent = 'Developing Leader';
+    document.getElementById('cert-feedback').textContent = 'You showed ethical awareness in some situations but wavered in others. The good news: recognizing where you struggled is the first step to becoming the leader you want to be.';
+  } else {
+    ring.className = 'cert-score-ring low';
+    document.getElementById('cert-stamp').textContent = '📋';
+    document.getElementById('cert-verdict').textContent = 'Ethics in Progress';
+    document.getElementById('cert-feedback').textContent = 'Several of your choices prioritized convenience over integrity. Reflect on the learning insights from each dilemma — ethical leadership is a skill that grows with deliberate practice.';
+  }
+
+  /* Badges */
+  const bc = document.getElementById('cert-badges');
+  bc.innerHTML = '';
+  const defaultBadges = ['Course Complete', '5 Dilemmas Navigated'];
+  [...defaultBadges, ...badgesEarned].slice(0, 6).forEach(b => {
+    bc.innerHTML += `<div class="cert-badge">⭐ ${b}</div>`;
+  });
+}
+
+function restartCourse() {
+  trustScore = 50;
+  currentScene = 0;
+  choicesMade = {};
+  badgesEarned = [];
+  document.getElementById('cert-overlay').classList.remove('show');
+  changeTrust(0);
+  renderScene(0);
+}
+
+/* ═══════════════════════════════════════
+   INIT
+═══════════════════════════════════════ */
+function startCourse() {
+  /* Hide splash */
+  const splash = document.getElementById('splash-screen');
+  splash.classList.add('hide');
+  setTimeout(() => { splash.style.display = 'none'; }, 600);
+
+  /* Show main UI */
+  document.getElementById('main-hud').style.display = 'flex';
+  document.getElementById('main-layout').style.display = 'grid';
+
+  /* Build chapter dots */
+  const dots = document.getElementById('chapter-dots');
+  SCENES.forEach((s, i) => {
+    const d = document.createElement('div');
+    d.className = 'ch-dot' + (i === 0 ? ' active' : ' locked');
+    d.setAttribute('data-label', s.chapter);
+    dots.appendChild(d);
+  });
+
+  /* Render first scene */
+  renderScene(0);
+}
+</script>
+</body>
+</html>
