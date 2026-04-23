@@ -674,14 +674,46 @@ body {
 .char-sam .char-arm { background: #4a8a60; }
 .char-sam .char-leg { background: #2a3a2a; }
 
-/* Character: Maya (Direct Report) */
+/* Character: Maya (Direct Report) — Female */
 .char-maya .char-head { background: #e8b890; }
-.char-maya .char-hair { background: #2a1808; height: 24px; border-radius: 50%; }
+.char-maya .char-hair {
+  background: #2a1808;
+  height: 30px;
+  border-radius: 50% 50% 40% 40%;
+  top: -8px;
+  left: -5px;
+  right: -5px;
+  box-shadow: -6px 8px 0 2px #2a1808, 6px 8px 0 2px #2a1808;
+}
 .char-maya .char-face { background: #e8b890; }
-.char-maya .char-body { background: #9a3a5a; height: 54px; }
+/* Eyelashes for Maya */
+.char-maya .char-eye::before {
+  content: '';
+  position: absolute;
+  top: -3px; left: -1px;
+  width: 7px; height: 3px;
+  border-top: 2px solid #1a1a1a;
+  border-radius: 50% 50% 0 0;
+}
+.char-maya .char-body {
+  background: linear-gradient(180deg, #c2185b, #9a3a5a);
+  height: 50px;
+  border-radius: 10px 10px 14px 14px;
+  width: 44px;
+}
 .char-maya .char-collar { background: #fff; }
-.char-maya .char-arm { background: #9a3a5a; }
-.char-maya .char-leg { background: #1a1a2a; }
+.char-maya .char-arm { background: #9a3a5a; width: 9px; }
+.char-maya .char-leg { background: #1a1a2a; width: 16px; }
+/* Skirt flare for Maya */
+.char-maya .char-body::after {
+  content: '';
+  position: absolute;
+  bottom: -6px; left: -4px; right: -4px;
+  height: 10px;
+  background: linear-gradient(180deg, #9a3a5a, #7a2a4a);
+  border-radius: 0 0 8px 8px;
+  clip-path: polygon(0 0, 100% 0, 110% 100%, -10% 100%);
+}
 
 /* Character: Director Chen */
 .char-chen .char-head { background: #c09070; }
@@ -1348,28 +1380,28 @@ body {
     </p>
     <div class="splash-cast">
       <div class="cast-card">
-        <div class="cast-avatar" style="background:#2d4a7a">👔</div>
+        <div class="cast-avatar" style="background:#2d4a7a;font-size:0.7rem;color:white;font-weight:bold;">AL</div>
         <div class="cast-info">
           <span class="cast-name">ALEX</span>
           <span class="cast-role">You — The Manager</span>
         </div>
       </div>
       <div class="cast-card">
-        <div class="cast-avatar" style="background:#4a8a60">🤝</div>
+        <div class="cast-avatar" style="background:#4a8a60;font-size:0.7rem;color:white;font-weight:bold;">SA</div>
         <div class="cast-info">
           <span class="cast-name">SAM</span>
           <span class="cast-role">Your Peer</span>
         </div>
       </div>
       <div class="cast-card">
-        <div class="cast-avatar" style="background:#9a3a5a">📋</div>
+        <div class="cast-avatar" style="background:#c2185b;font-size:0.7rem;color:white;font-weight:bold;">MA</div>
         <div class="cast-info">
           <span class="cast-name">MAYA</span>
           <span class="cast-role">Your Direct Report</span>
         </div>
       </div>
       <div class="cast-card">
-        <div class="cast-avatar" style="background:#1a1a1a">🏢</div>
+        <div class="cast-avatar" style="background:#1a1a1a;font-size:0.7rem;color:white;font-weight:bold;">CH</div>
         <div class="cast-info">
           <span class="cast-name">DIRECTOR CHEN</span>
           <span class="cast-role">Your Boss</span>
@@ -1768,31 +1800,57 @@ const BG_FG = {
   hallway: ``,
 };
 const CHAR_CONFIGS = {
-  'char-alex':   { head: '#d4956a', hair: '#3a2510', body: '#2d4a7a', leg: '#1a2a3a', collar: '#fff' },
-  'char-sam':    { head: '#c8805a', hair: '#1a0a08', body: '#4a8a60', leg: '#2a3a2a', collar: '#fff' },
-  'char-maya':   { head: '#e8b890', hair: '#2a1808', body: '#9a3a5a', leg: '#1a1a2a', collar: '#fff' },
-  'char-chen':   { head: '#c09070', hair: '#0a0a0a', body: '#1a1a1a', leg: '#0a0a0a', collar: '#f0f0f0' },
-  'char-jordan': { head: '#d8a880', hair: '#5a3010', body: '#6a3a8a', leg: '#2a1a3a', collar: '#fff' },
+  'char-alex':   { head: '#d4956a', hair: '#3a2510', body: '#2d4a7a', leg: '#1a2a3a', collar: '#fff', isFemale: false },
+  'char-sam':    { head: '#c8805a', hair: '#1a0a08', body: '#4a8a60', leg: '#2a3a2a', collar: '#fff', isFemale: false },
+  'char-maya':   { head: '#e8b890', hair: '#2a1808', body: '#c2185b', leg: '#1a1a2a', collar: '#fff', isFemale: true },
+  'char-chen':   { head: '#c09070', hair: '#0a0a0a', body: '#1a1a1a', leg: '#0a0a0a', collar: '#f0f0f0', isFemale: false },
+  'char-jordan': { head: '#d8a880', hair: '#5a3010', body: '#6a3a8a', leg: '#2a1a3a', collar: '#fff', isFemale: false },
 };
 
 function buildChar(cls, x, y, size, mouthType) {
   const cfg = CHAR_CONFIGS[cls];
   const scale = size / 120;
   const mouth = mouthType || 'smile';
+  const isFemale = cfg.isFemale;
+
+  // Hair style
+  const hairStyle = isFemale
+    ? `position:absolute;top:-9px;left:-6px;right:-6px;height:32px;border-radius:50% 50% 40% 40%;background:${cfg.hair};box-shadow:-6px 10px 0 2px ${cfg.hair};`
+    : `position:absolute;top:-4px;left:-2px;right:-2px;height:20px;border-radius:50% 50% 0 0;background:${cfg.hair};`;
+
+  // Eyelashes for female
+  const eyeHTML = isFemale
+    ? `<div style="display:flex;gap:8px;">
+        <div style="width:5px;height:5px;border-radius:50%;background:#1a1a1a;position:relative;">
+          <div style="position:absolute;top:-3px;left:-1px;width:7px;height:3px;border-top:2px solid #1a1a1a;border-radius:50% 50% 0 0;"></div>
+        </div>
+        <div style="width:5px;height:5px;border-radius:50%;background:#1a1a1a;position:relative;">
+          <div style="position:absolute;top:-3px;left:-1px;width:7px;height:3px;border-top:2px solid #1a1a1a;border-radius:50% 50% 0 0;"></div>
+        </div>
+      </div>`
+    : `<div style="display:flex;gap:8px;"><div style="width:5px;height:5px;border-radius:50%;background:#1a1a1a;"></div><div style="width:5px;height:5px;border-radius:50%;background:#1a1a1a;"></div></div>`;
+
+  // Body style - female gets slight flare at bottom
+  const bodyStyle = isFemale
+    ? `width:44px;height:50px;background:linear-gradient(180deg,${cfg.body},${cfg.body}cc);border-radius:10px 10px 14px 14px;position:relative;box-shadow:0 6px 20px rgba(0,0,0,0.4);`
+    : `width:48px;height:52px;background:${cfg.body};border-radius:8px 8px 2px 2px;position:relative;box-shadow:0 6px 20px rgba(0,0,0,0.4);`;
+
+  const skirtHTML = isFemale
+    ? `<div style="position:absolute;bottom:-8px;left:-5px;right:-5px;height:12px;background:linear-gradient(180deg,${cfg.body}cc,${cfg.body}88);border-radius:0 0 10px 10px;clip-path:polygon(0 0,100% 0,108% 100%,-8% 100%);"></div>`
+    : '';
+
   return `
   <div style="position:absolute;left:${x};bottom:${y};transform:translateX(-50%) scale(${scale});transform-origin:bottom center;display:flex;flex-direction:column;align-items:center;gap:0;transition:all 0.5s;">
     <div style="width:38px;height:38px;border-radius:50%;background:${cfg.head};position:relative;margin-bottom:-2px;z-index:2;box-shadow:0 4px 12px rgba(0,0,0,0.4);">
-      <div style="position:absolute;top:-4px;left:-2px;right:-2px;height:20px;border-radius:50% 50% 0 0;background:${cfg.hair};"></div>
+      <div style="${hairStyle}"></div>
       <div style="position:absolute;bottom:4px;left:4px;right:4px;height:22px;border-radius:0 0 50% 50%;background:${cfg.head};display:flex;align-items:center;justify-content:center;flex-direction:column;gap:3px;">
-        <div style="display:flex;gap:8px;">
-          <div style="width:5px;height:5px;border-radius:50%;background:#1a1a1a;"></div>
-          <div style="width:5px;height:5px;border-radius:50%;background:#1a1a1a;"></div>
-        </div>
+        ${eyeHTML}
         <div style="width:12px;height:4px;border-radius:${mouth==='smile'?'0 0 8px 8px':mouth==='frown'?'8px 8px 0 0':'0'};border:2px solid #5a2a1a;${mouth==='frown'?'border-top:2px solid #5a2a1a;border-bottom:none;':'border-top:none;'}${mouth==='neutral'?'height:2px;border:none;background:#5a2a1a;width:10px;':''}"></div>
       </div>
     </div>
-    <div style="width:48px;height:52px;background:${cfg.body};border-radius:8px 8px 2px 2px;position:relative;box-shadow:0 6px 20px rgba(0,0,0,0.4);">
+    <div style="${bodyStyle}">
       <div style="position:absolute;top:0;left:50%;transform:translateX(-50%);width:16px;height:10px;clip-path:polygon(0 0,100% 0,70% 100%,30% 100%);background:${cfg.collar};"></div>
+      ${skirtHTML}
     </div>
     <div style="display:flex;gap:4px;margin-top:2px;">
       <div style="width:18px;height:28px;border-radius:0 0 4px 4px;background:${cfg.leg};"></div>
@@ -1802,8 +1860,22 @@ function buildChar(cls, x, y, size, mouthType) {
 }
 
 /* ═══════════════════════════════════════
-   RENDER ENGINE
+   CHARACTER FACE SVGs FOR BUBBLES
 ═══════════════════════════════════════ */
+
+function buildFaceAvatar(speaker) {
+  const avatarMap = {
+    'SAM':           { initials: 'SA', bg: '#4a8a60' },
+    'YOU (ALEX)':    { initials: 'AL', bg: '#2d4a7a' },
+    'ALEX':          { initials: 'AL', bg: '#2d4a7a' },
+    'MAYA':          { initials: 'MA', bg: '#c2185b' },
+    'DIRECTOR CHEN': { initials: 'CH', bg: '#1a1a1a' },
+    'JORDAN (HR)':   { initials: 'JO', bg: '#6a3a8a' },
+  };
+  const a = avatarMap[speaker];
+  if (!a) return `<div class="bubble-avatar" style="background:#888;display:flex;align-items:center;justify-content:center;color:white;font-size:0.7rem;font-weight:700;">?</div>`;
+  return `<div class="bubble-avatar" style="background:${a.bg};display:flex;align-items:center;justify-content:center;color:white;font-size:0.65rem;font-weight:800;font-family:'Fira Code',monospace;letter-spacing:0.03em;">${a.initials}</div>`;
+}
 let narrativeQueue = [];
 let choiceAnswered = false;
 let choiceResult = null;
@@ -1889,10 +1961,8 @@ function renderNarrativeItem(item, delay) {
     } else if (item.type === 'bubble') {
       el = document.createElement('div');
       el.className = 'speech-bubble ' + (item.side || 'left');
-      const avatarBg = { 'SAM': '#4a8a60', 'MAYA': '#9a3a5a', 'DIRECTOR CHEN': '#1a1a1a', 'JORDAN (HR)': '#6a3a8a', 'YOU (ALEX)': '#2d4a7a', 'ALEX': '#2d4a7a' };
-      const bg = avatarBg[item.speaker] || '#666';
       el.innerHTML = `
-        <div class="bubble-avatar" style="background:${bg}">${item.avatar}</div>
+        ${buildFaceAvatar(item.speaker)}
         <div class="bubble-content">
           <div class="bubble-name">${item.speaker}</div>
           <div class="bubble-text">${item.text}</div>
