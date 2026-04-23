@@ -495,6 +495,21 @@ body {
   border: 2px solid rgba(255,255,255,0.15);
   border-radius: 3px;
   box-shadow: 0 0 30px rgba(138,180,204,0.2);
+  overflow: hidden;
+}
+.bg-breakroom .window-br::before {
+  content: '';
+  position: absolute;
+  top: 0; bottom: 0; left: 50%;
+  width: 2px;
+  background: rgba(255,255,255,0.2);
+}
+.bg-breakroom .window-br::after {
+  content: '';
+  position: absolute;
+  left: 0; right: 0; top: 50%;
+  height: 2px;
+  background: rgba(255,255,255,0.2);
 }
 .bg-breakroom .table-br {
   position: absolute;
@@ -1075,15 +1090,16 @@ body {
   color: var(--ink2);
   border-radius: 6px;
   cursor: pointer;
-  transition: all 0.18s;
+  transition: transform 0.18s ease;
   display: flex;
   align-items: center;
   gap: 0.4rem;
 }
 .nav-btn:hover:not(:disabled) {
-  border-color: var(--forest);
-  color: var(--forest);
-  background: linear-gradient(135deg, #f0faf5, #e4f5ec);
+  transform: scale(1.04);
+}
+.nav-btn:active:not(:disabled) {
+  transform: scale(0.97);
 }
 .nav-btn:disabled { opacity: 0.25; cursor: default; }
 .nav-btn.primary {
@@ -1091,7 +1107,7 @@ body {
   border-color: var(--forest);
   color: #fff;
 }
-.nav-btn.primary:hover { background: var(--forest2); }
+.nav-btn.primary:hover { background: var(--forest); }
 .scene-indicator {
   font-family: 'Fira Code', monospace;
   font-size: 0.6rem;
@@ -1596,6 +1612,7 @@ const SCENES = [
     bg: 'breakroom',
     chars: [
       { cls: 'char-alex', x: '40%', y: '22%', size: 115, emotion: 'neutral', label: 'ALEX' },
+      { cls: 'char-chen', x: '65%', y: '22%', size: 115, emotion: 'neutral', label: 'CHEN' },
     ],
     narrative: [
       { type: 'narrator', text: 'Later that afternoon, you speak with Director Chen about the timeline for communicating the restructuring. You push for faster, clearer communication.' },
@@ -2015,9 +2032,7 @@ function handleChoice(sceneIdx, choiceIdx) {
 
   setTimeout(() => {
     /* Play outcome sound */
-    if (choice.outcome === 'good') SFX.good();
-    else if (choice.outcome === 'bad') SFX.bad();
-    else SFX.neutral();
+    SFX.good();
 
     /* Outcome banner */
     const banner = document.createElement('div');
