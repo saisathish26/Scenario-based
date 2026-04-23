@@ -169,6 +169,7 @@ body {
   position: absolute;
   inset: 0;
   transition: opacity 0.8s ease;
+  z-index: 1;
 }
 
 /* Scene divider line */
@@ -200,6 +201,7 @@ body {
   background: linear-gradient(180deg, #6b4226, #4a2d18);
   border-radius: 4px 4px 0 0;
   box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+  z-index: 6;
 }
 .bg-office .desk::after {
   content: '';
@@ -233,31 +235,56 @@ body {
   height: 2px;
   background: rgba(255,255,255,0.15);
 }
+/* Floor lamp: base + pole + shade */
 .bg-office .lamp {
   position: absolute;
-  bottom: 48%; right: 22%;
-  width: 8px; height: 40px;
-  background: #5a3a20;
+  bottom: 33%; right: 12%;
+  width: 20px; height: 6px;
+  background: linear-gradient(180deg, #999, #555);
+  border-radius: 10px;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.6);
 }
-.bg-office .lamp::before {
+.bg-office .lamp-pole {
+  position: absolute;
+  bottom: calc(33% + 6px); right: calc(12% + 7px);
+  width: 6px; height: 100px;
+  background: linear-gradient(90deg, #999, #666, #888);
+  border-radius: 3px;
+}
+.bg-office .lamp-shade {
+  position: absolute;
+  bottom: calc(33% + 100px); right: calc(12% - 10px);
+  width: 42px; height: 0;
+  border-left: 10px solid transparent;
+  border-right: 10px solid transparent;
+  border-top: 0;
+  border-bottom: 26px solid #d4902a;
+  filter: drop-shadow(0 -2px 6px rgba(220,150,30,0.6));
+}
+.bg-office .lamp-shade::before {
   content: '';
   position: absolute;
-  bottom: 100%; left: 50%;
-  transform: translateX(-50%);
-  width: 30px; height: 16px;
-  background: linear-gradient(180deg, #8b6520, #6b4a15);
-  border-radius: 30px 30px 0 0;
-  clip-path: polygon(0 100%, 100% 100%, 80% 0%, 20% 0%);
+  top: 26px; left: -10px; right: -10px;
+  height: 5px;
+  background: linear-gradient(180deg, #b8780a, #8a5500);
+  border-radius: 0 0 4px 4px;
 }
-.bg-office .lamp::after {
+.bg-office .lamp-shade::after {
   content: '';
   position: absolute;
-  bottom: 100%; left: 50%;
+  top: -6px; left: 50%;
   transform: translateX(-50%);
-  width: 60px; height: 60px;
-  background: radial-gradient(circle, rgba(255,200,80,0.25) 0%, transparent 70%);
+  width: 8px; height: 8px;
+  background: #aaa;
   border-radius: 50%;
-  top: -60px;
+}
+.bg-office .lamp-glow {
+  position: absolute;
+  bottom: calc(33% + 80px); right: calc(12% - 30px);
+  width: 90px; height: 90px;
+  background: radial-gradient(ellipse at center bottom, rgba(255,200,60,0.4) 0%, rgba(255,170,30,0.15) 50%, transparent 75%);
+  border-radius: 50%;
+  pointer-events: none;
 }
 .bg-office .monitor {
   position: absolute;
@@ -311,6 +338,7 @@ body {
   background: linear-gradient(180deg, #c8a06a, #9a7040);
   border-radius: 40px;
   box-shadow: 0 6px 30px rgba(0,0,0,0.5);
+  z-index: 6;
 }
 .bg-meeting .mtable::after {
   content: '';
@@ -380,27 +408,27 @@ body {
 }
 .bg-hallway .door {
   position: absolute;
-  bottom: 25%; left: 15%;
-  width: 50px; height: 80px;
+  bottom: 25%; left: 10%;
+  width: 90px; height: 160px;
   background: linear-gradient(180deg, #5a3a28, #3a2018);
-  border: 2px solid rgba(255,255,255,0.1);
-  border-radius: 3px 3px 0 0;
+  border: 3px solid rgba(255,255,255,0.15);
+  border-radius: 4px 4px 0 0;
 }
 .bg-hallway .door::before {
   content: '';
   position: absolute;
-  right: 8px; top: 40%;
-  width: 6px; height: 6px;
+  right: 12px; top: 45%;
+  width: 10px; height: 10px;
   border-radius: 50%;
   background: #c8a040;
 }
 .bg-hallway .door2 {
   position: absolute;
-  bottom: 25%; right: 20%;
-  width: 40px; height: 65px;
+  bottom: 25%; right: 15%;
+  width: 70px; height: 130px;
   background: linear-gradient(180deg, #4a3020, #2a1808);
   border: 2px solid rgba(255,255,255,0.08);
-  border-radius: 3px 3px 0 0;
+  border-radius: 4px 4px 0 0;
   opacity: 0.6;
 }
 .bg-hallway .ceiling-light {
@@ -470,10 +498,11 @@ body {
 }
 .bg-breakroom .table-br {
   position: absolute;
-  bottom: 26%; left: 30%; right: 15%;
+  bottom: 26%; left: 15%; right: 10%;
   height: 10px;
   background: linear-gradient(180deg, #a07850, #7a5830);
   border-radius: 3px;
+  z-index: 6;
 }
 .bg-breakroom .chairs-br {
   position: absolute;
@@ -492,7 +521,14 @@ body {
 .characters-layer {
   position: absolute;
   inset: 0;
-  z-index: 5;
+  z-index: 3;
+}
+
+.scene-fg {
+  position: absolute;
+  inset: 0;
+  z-index: 6;
+  pointer-events: none;
 }
 
 .character-fig {
@@ -1392,8 +1428,7 @@ body {
     <div class="scene-bg bg-office" id="scene-bg">
       <!-- Office elements -->
       <div class="floor"></div>
-      <div class="desk"></div>
-      <div class="window"></div>
+        <div class="window"></div>
       <div class="lamp"></div>
       <div class="monitor"></div>
       <div class="plant">
@@ -1406,6 +1441,7 @@ body {
       </div>
     </div>
     <div class="characters-layer" id="chars-layer"></div>
+    <div class="scene-fg" id="scene-fg"></div>
     <div class="scene-transition" id="scene-transition"></div>
   </div>
 
@@ -1458,8 +1494,8 @@ const SCENES = [
     chapter: 'Chapter 1', title: 'A Favor Between Friends', location: '📍 Your Office',
     bg: 'office',
     chars: [
-      { cls: 'char-alex', x: '55%', y: '20%', size: 120, emotion: 'neutral', label: 'ALEX' },
-      { cls: 'char-sam',  x: '25%', y: '25%', size: 110, emotion: 'smile',   label: 'SAM' },
+      { cls: 'char-alex', x: '55%', y: '24%', size: 120, emotion: 'neutral', label: 'ALEX' },
+      { cls: 'char-sam',  x: '25%', y: '26%', size: 110, emotion: 'smile',   label: 'SAM' },
     ],
     narrative: [
       { type: 'narrator', text: 'Monday, 9:14 AM. You have been manager of the Product Analytics team for exactly three weeks. Your office still smells like fresh paint.' },
@@ -1484,7 +1520,7 @@ const SCENES = [
     chapter: 'Chapter 1', title: 'A Favor Between Friends', location: '📍 Your Office',
     bg: 'office',
     chars: [
-      { cls: 'char-alex', x: '55%', y: '20%', size: 120, emotion: 'neutral', label: 'ALEX' },
+      { cls: 'char-alex', x: '55%', y: '24%', size: 120, emotion: 'neutral', label: 'ALEX' },
     ],
     narrative: [
       { type: 'narrator', text: 'Sam leaves. You sit with the decision for a moment.' },
@@ -1500,8 +1536,8 @@ const SCENES = [
     bg: 'breakroom',
     chars: [
       { cls: 'char-alex', x: '20%', y: '22%', size: 110, emotion: 'neutral', label: 'ALEX' },
-      { cls: 'char-sam',  x: '60%', y: '25%', size: 100, emotion: 'neutral', label: 'SAM' },
-      { cls: 'char-maya', x: '75%', y: '25%', size: 100, emotion: 'neutral', label: 'MAYA' },
+      { cls: 'char-sam',  x: '55%', y: '22%', size: 100, emotion: 'neutral', label: 'SAM' },
+      { cls: 'char-maya', x: '78%', y: '22%', size: 100, emotion: 'neutral', label: 'MAYA' },
     ],
     narrative: [
       { type: 'narrator', text: 'Wednesday. The break room. You pour coffee, half-listening to the room.' },
@@ -1542,8 +1578,8 @@ const SCENES = [
     chapter: 'Chapter 3', title: 'The Performance Review', location: '📍 Meeting Room',
     bg: 'meeting',
     chars: [
-      { cls: 'char-alex', x: '55%', y: '18%', size: 120, emotion: 'neutral', label: 'ALEX' },
-      { cls: 'char-maya', x: '20%', y: '22%', size: 110, emotion: 'neutral', label: 'MAYA' },
+      { cls: 'char-alex', x: '55%', y: '24%', size: 120, emotion: 'neutral', label: 'ALEX' },
+      { cls: 'char-maya', x: '20%', y: '24%', size: 110, emotion: 'neutral', label: 'MAYA' },
     ],
     narrative: [
       { type: 'narrator', text: "Performance review season. Maya sits across from you. She's been a solid contributor — but the last project ran significantly over schedule due to unclear requirements from another team." },
@@ -1568,8 +1604,8 @@ const SCENES = [
     chapter: 'Chapter 3', title: 'The Performance Review', location: '📍 Meeting Room',
     bg: 'meeting',
     chars: [
-      { cls: 'char-alex', x: '30%', y: '18%', size: 120, emotion: 'neutral', label: 'ALEX' },
-      { cls: 'char-chen', x: '65%', y: '20%', size: 115, emotion: 'neutral', label: 'CHEN' },
+      { cls: 'char-alex', x: '30%', y: '24%', size: 120, emotion: 'neutral', label: 'ALEX' },
+      { cls: 'char-chen', x: '65%', y: '24%', size: 115, emotion: 'neutral', label: 'CHEN' },
     ],
     narrative: [
       { type: 'narrator', text: 'You schedule a meeting with Director Chen. You walk in with Maya\'s documented performance data and the change log from the dev team.' },
@@ -1586,8 +1622,8 @@ const SCENES = [
     chapter: 'Chapter 4', title: 'The Shortcut', location: '📍 Hallway',
     bg: 'hallway',
     chars: [
-      { cls: 'char-alex', x: '30%', y: '18%', size: 120, emotion: 'neutral', label: 'ALEX' },
-      { cls: 'char-sam',  x: '65%', y: '20%', size: 110, emotion: 'neutral', label: 'SAM' },
+      { cls: 'char-alex', x: '30%', y: '25%', size: 120, emotion: 'neutral', label: 'ALEX' },
+      { cls: 'char-sam',  x: '65%', y: '25%', size: 110, emotion: 'neutral', label: 'SAM' },
     ],
     narrative: [
       { type: 'narrator', text: 'Thursday afternoon. Sam catches up to you in the hallway, glancing over their shoulder.' },
@@ -1612,7 +1648,7 @@ const SCENES = [
     chapter: 'Chapter 4', title: 'The Shortcut', location: '📍 Your Office',
     bg: 'office',
     chars: [
-      { cls: 'char-alex', x: '50%', y: '18%', size: 120, emotion: 'neutral', label: 'ALEX' },
+      { cls: 'char-alex', x: '50%', y: '24%', size: 120, emotion: 'neutral', label: 'ALEX' },
     ],
     narrative: [
       { type: 'narrator', text: 'The Nexus Corp pitch goes ahead — on the strength of your team\'s actual work. The proposal is sharp. Honest. Yours.' },
@@ -1627,8 +1663,8 @@ const SCENES = [
     chapter: 'Chapter 5', title: 'The Report You Cannot Ignore', location: '📍 Meeting Room',
     bg: 'meeting',
     chars: [
-      { cls: 'char-alex',   x: '50%', y: '18%', size: 120, emotion: 'neutral', label: 'ALEX' },
-      { cls: 'char-jordan', x: '18%', y: '22%', size: 110, emotion: 'neutral', label: 'JORDAN' },
+      { cls: 'char-alex',   x: '50%', y: '24%', size: 120, emotion: 'neutral', label: 'ALEX' },
+      { cls: 'char-jordan', x: '18%', y: '24%', size: 110, emotion: 'neutral', label: 'JORDAN' },
     ],
     narrative: [
       { type: 'narrator', text: "Final chapter. Jordan from HR requests a meeting. They close the door." },
@@ -1654,7 +1690,7 @@ const SCENES = [
     chapter: 'Epilogue', title: 'The Leader You Choose to Be', location: '📍 Your Office',
     bg: 'office',
     chars: [
-      { cls: 'char-alex', x: '45%', y: '18%', size: 130, emotion: 'smile', label: 'ALEX' },
+      { cls: 'char-alex', x: '45%', y: '26%', size: 130, emotion: 'smile', label: 'ALEX' },
     ],
     narrative: [
       { type: 'narrator', text: 'Six months later. Your team is intact. Maya got a deserved promotion. The Nexus Corp pitch won. Jordan sent you a note of appreciation. Sam — well, Sam is still figuring things out.' },
@@ -1693,9 +1729,11 @@ const SCENE_CHARS = {
 const BG_HTML = {
   office: `
     <div class="floor"></div>
-    <div class="desk"></div>
     <div class="window"></div>
     <div class="lamp"></div>
+    <div class="lamp-pole"></div>
+    <div class="lamp-shade"></div>
+    <div class="lamp-glow"></div>
     <div class="monitor"></div>
     <div class="plant">
       <div class="plant-leaves">
@@ -1706,19 +1744,11 @@ const BG_HTML = {
   meeting: `
     <div class="projector-light"></div>
     <div class="screen"><div class="screen-text">Q4 STRATEGY<br>────────<br>NEXUS CORP<br>PITCH DECK<br>v2.1</div></div>
-    <div class="mtable"></div>
-    <div class="chairs">
-      <div class="chair"></div><div class="chair"></div>
-      <div class="chair"></div><div class="chair"></div>
-    </div>`,
+`,
   breakroom: `
-    <div class="counter"></div>
     <div class="coffee-maker"></div>
     <div class="window-br"></div>
-    <div class="table-br"></div>
-    <div class="chairs-br">
-      <div class="chair-br"></div><div class="chair-br"></div>
-    </div>`,
+`,
   hallway: `
     <div class="corridor"></div>
     <div class="ceiling-light"></div>
@@ -1727,7 +1757,16 @@ const BG_HTML = {
     <div class="door2"></div>`,
 };
 
-/* Character builder */
+const BG_FG = {
+  // Table surface on top, then a ~45px tall mask below it matching bg color — just enough to hide legs
+  office:    `<div style="position:absolute;bottom:30%;left:15%;right:15%;height:18px;background:linear-gradient(180deg,#6b4226,#4a2d18);border-radius:4px 4px 0 0;box-shadow:0 4px 20px rgba(0,0,0,0.5);z-index:2;"></div>
+              <div style="position:absolute;bottom:calc(30% - 45px);left:15%;right:15%;height:45px;background:linear-gradient(180deg,#3a2810,#2a1a0a);z-index:2;"></div>`,
+  meeting:   `<div style="position:absolute;bottom:28%;left:8%;right:8%;height:20px;background:linear-gradient(180deg,#c8a06a,#9a7040);border-radius:40px;box-shadow:0 6px 30px rgba(0,0,0,0.5);z-index:2;"></div>
+              <div style="position:absolute;bottom:calc(28% - 45px);left:10%;right:10%;height:45px;background:linear-gradient(180deg,#6a4a28,#3a2810);border-radius:0 0 16px 16px;z-index:2;"></div>`,
+  breakroom: `<div style="position:absolute;bottom:26%;left:15%;right:10%;height:10px;background:linear-gradient(180deg,#a07850,#7a5830);border-radius:3px;box-shadow:0 4px 12px rgba(0,0,0,0.4);z-index:2;"></div>
+              <div style="position:absolute;bottom:calc(26% - 45px);left:15%;right:10%;height:45px;background:linear-gradient(180deg,#5a3a20,#3a2010);border-radius:0 0 4px 4px;z-index:2;"></div>`,
+  hallway: ``,
+};
 const CHAR_CONFIGS = {
   'char-alex':   { head: '#d4956a', hair: '#3a2510', body: '#2d4a7a', leg: '#1a2a3a', collar: '#fff' },
   'char-sam':    { head: '#c8805a', hair: '#1a0a08', body: '#4a8a60', leg: '#2a3a2a', collar: '#fff' },
@@ -1785,6 +1824,10 @@ function renderScene(idx) {
   const bg = document.getElementById('scene-bg');
   bg.className = 'scene-bg bg-' + scene.bg;
   bg.innerHTML = BG_HTML[scene.bg] || '';
+
+  /* Foreground furniture (renders above characters) */
+  const fg = document.getElementById('scene-fg');
+  fg.innerHTML = BG_FG[scene.bg] || '';
 
   /* Characters */
   const layer = document.getElementById('chars-layer');
